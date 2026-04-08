@@ -67,9 +67,9 @@ const BusinessIdeas = () => {
     ];
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#F8FAFC] animate-in fade-in duration-500 pb-24">
+        <div className="flex flex-col min-h-screen bg-[#F8FAFC] animate-in fade-in duration-500 pb-6">
             {/* Header Section */}
-            <div className="bg-white px-5 pt-8 pb-6 flex items-center justify-between sticky top-0 z-30 border-b border-slate-100">
+            <div className="bg-white px-4 py-3 flex items-center justify-between sticky top-0 z-30 border-b border-slate-100">
                 <button 
                     onClick={() => navigate(-1)}
                     className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-600 active:scale-90 transition-all border border-slate-100"
@@ -83,7 +83,7 @@ const BusinessIdeas = () => {
                 <div className="w-10 h-10"></div>
             </div>
 
-            <div className="px-5 mt-6">
+            <div className="px-2 mt-3">
                 {/* Visual Tab Switcher */}
                 <div className="bg-white p-1.5 rounded-2xl border border-slate-100 flex items-center shadow-sm">
                     <button 
@@ -104,11 +104,11 @@ const BusinessIdeas = () => {
                     </button>
                 </div>
 
-                <div className="mt-8 space-y-5 animate-in slide-in-from-bottom-4 duration-500">
+                <div className="mt-4 space-y-3 animate-in slide-in-from-bottom-4 duration-500">
                     {activeTab === 'free' ? (
                         FREE_IDEAS.map((idea) => (
-                            <div key={idea.id} className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm relative overflow-hidden group">
-                                <div className="flex items-start gap-4">
+                            <div key={idea.id} className="bg-white rounded-2xl p-3.5 border border-slate-100 shadow-sm relative overflow-hidden group">
+                                <div className="flex items-start gap-3">
                                     <div className={`w-14 h-14 ${idea.bg} rounded-2xl flex items-center justify-center ${idea.color} shadow-sm border border-black/5`}>
                                         <idea.icon size={28} />
                                     </div>
@@ -154,8 +154,8 @@ const BusinessIdeas = () => {
                             )}
 
                             {PREMIUM_IDEAS.map((idea) => (
-                                <div key={idea.id} className={`bg-white rounded-3xl p-5 border border-slate-100 shadow-sm relative overflow-hidden group ${!isPaid ? 'opacity-60 grayscale filter' : ''}`}>
-                                    <div className="flex items-start gap-4">
+                                <div key={idea.id} className={`bg-white rounded-2xl p-3.5 border border-slate-100 shadow-sm relative overflow-hidden group ${!isPaid ? 'opacity-60 grayscale filter' : ''}`}>
+                                    <div className="flex items-start gap-3">
                                         <div className={`w-14 h-14 ${idea.bg} rounded-2xl flex items-center justify-center ${idea.color} border border-black/5`}>
                                             <idea.icon size={28} />
                                         </div>
@@ -196,8 +196,8 @@ const BusinessIdeas = () => {
             </div>
 
             {/* Bottom Info Banner */}
-            <div className="px-5 mt-8">
-                <div className="bg-white rounded-3xl p-6 border border-slate-100 flex items-center gap-4">
+            <div className="px-2 mt-4">
+                <div className="bg-white rounded-2xl p-4 border border-slate-100 flex items-center gap-4">
                     <div className="w-12 h-12 bg-sky-50 rounded-2xl flex items-center justify-center text-sky-500">
                         <CheckCircle2 size={24} />
                     </div>

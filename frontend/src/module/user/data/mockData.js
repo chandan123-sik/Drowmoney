@@ -41,9 +41,15 @@ export const MOCK_USER = {
 };
 
 export const TASKS = [
-  { id: 1, title: "Watch 30s Ad", type: "Video", reward: 1, icon: "Play" },
-  { id: 2, title: "Visit Promo Page", type: "Web", reward: 1, icon: "ExternalLink" },
-  { id: 3, title: "Follow Instagram", type: "Social", reward: 3, icon: "Hash" },
+  { id: 1, title: "Visit Business Idea Page", description: "Explore the business idea page", reward: "+1 Coin", actionText: "Complete", icon: "Monitor" },
+  { id: 2, title: "Watch a Short Video", description: "Watch a video till the end", reward: "+1 Coin", actionText: "Complete", icon: "Youtube" },
+  { id: 3, title: "Answer a Simple Quiz", description: "Answer a quick question", reward: "+1 Coin", actionText: "Complete", icon: "Lightbulb" },
+  { id: 4, title: "Spin the Wheel", description: "Spin the wheel to win coins", reward: "Win Up To 5 Coins", actionText: "Spin Now >", actionType: "highlighted", icon: "Disc" },
+  { id: 5, title: "Share Our Platform", description: "Share our link via WhatsApp", reward: "+1 Coin", actionText: "Complete", icon: "MessageCircle" },
+  { id: 6, title: "Upload Story for Us", description: "Upload our site story on Instagram", reward: "+2 Coins", actionText: "Complete", icon: "Instagram" },
+  { id: 7, title: "Like & Follow Us", description: "Like and follow our page", reward: "+2 Coins", actionText: "Complete", icon: "ThumbsUp" },
+  { id: 8, title: "Comment on Our Post", description: "Write a comment on our post", reward: "+1 Coin", actionText: "Complete", icon: "MessageSquare" },
+  { id: 9, title: "Open & Explore Link", description: "Open and explore an external site", reward: "+1 Coin", actionText: "Upload Proof", actionType: "highlighted", icon: "Link" },
 ];
 
 export const EVENTS = [

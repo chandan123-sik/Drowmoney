@@ -15,6 +15,9 @@ import MarketingHistory from './module/user/pages/MarketingHistory';
 import TaskRunner from './module/user/pages/TaskRunner';
 import ContestView from './module/user/pages/ContestView';
 import BusinessIdeas from './module/user/pages/BusinessIdeas';
+import InfoPage from './module/user/pages/InfoPage';
+import HelpCenter from './module/user/pages/HelpCenter';
+import FutureFund from './module/user/pages/FutureFund';
 
 // Auth Pages
 import AuthLayout from './module/user/auth/AuthLayout';
@@ -54,6 +57,9 @@ function App() {
           <Route path="wallet" element={<Wallet />} />
           <Route path="profile" element={<Profile />} />
           <Route path="business-ideas" element={<BusinessIdeas />} />
+          <Route path="info/:type" element={<InfoPage />} />
+          <Route path="help" element={<HelpCenter />} />
+          <Route path="future-fund" element={<FutureFund />} />
         </Route>
 
         {/* Immersive User Routes (No Bottom Nav) */}

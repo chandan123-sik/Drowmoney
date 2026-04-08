@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, ShieldCheck, CheckCircle2, FileText, Landmark } from 'lucide-react';
+import { X, ShieldCheck, CheckCircle2, FileText } from 'lucide-react';
 
 const KycModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
@@ -25,32 +25,12 @@ const KycModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="p-2">
-                    <div className="p-4 flex items-center justify-between border-b border-slate-50 group hover:bg-slate-50 transition-colors rounded-xl mx-1 mt-1">
+                    <div className="p-4 flex items-center justify-between group hover:bg-slate-50 transition-colors rounded-xl mx-1 my-1">
                         <div className="flex items-center gap-3">
                             <div className="bg-slate-100 p-2 rounded-lg group-hover:bg-white transition-colors">
                                 <FileText className="text-slate-400" size={16} />
                             </div>
                             <span className="font-black text-slate-700 text-[13px]">Aadhaar Card</span>
-                        </div>
-                        <CheckCircle2 size={18} className="text-emerald-500" strokeWidth={2.5} />
-                    </div>
-                    
-                    <div className="p-4 flex items-center justify-between border-b border-slate-50 group hover:bg-slate-50 transition-colors rounded-xl mx-1">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-slate-100 p-2 rounded-lg group-hover:bg-white transition-colors">
-                                <FileText className="text-slate-400" size={16} />
-                            </div>
-                            <span className="font-black text-slate-700 text-[13px]">PAN Card</span>
-                        </div>
-                        <CheckCircle2 size={18} className="text-emerald-500" strokeWidth={2.5} />
-                    </div>
-                    
-                    <div className="p-4 flex items-center justify-between group hover:bg-slate-50 transition-colors rounded-xl mx-1 mb-1">
-                        <div className="flex items-center gap-3">
-                            <div className="bg-slate-100 p-2 rounded-lg group-hover:bg-white transition-colors">
-                                <Landmark className="text-slate-400" size={16} />
-                            </div>
-                            <span className="font-black text-slate-700 text-[13px]">Bank Verification</span>
                         </div>
                         <CheckCircle2 size={18} className="text-emerald-500" strokeWidth={2.5} />
                     </div>

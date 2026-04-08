@@ -28,7 +28,7 @@ const INCOME_OPTIONS = [
         bg: 'bg-indigo-50',
         borderColor: 'border-indigo-100',
         cta: 'View Progress',
-        route: '/user/home',
+        route: '/user/future-fund',
         hasProgress: true
     },
     {
@@ -66,11 +66,11 @@ const INCOME_OPTIONS = [
         title: 'Future Features',
         subtitle: 'Upcoming earning opportunities',
         icon: Sparkles,
-        bg: 'bg-slate-50',
-        borderColor: 'border-slate-100',
+        bg: 'bg-slate-100',
+        borderColor: 'border-slate-200',
         cta: 'Discover',
-        route: null,
-        locked: true,
+        route: '/user/info/future-features',
+        locked: false,
     },
 ];
 
@@ -256,35 +256,35 @@ const Income = () => {
                         onSuccess={handlePaymentSuccess}
                     />
                 )}
-                <div className="flex flex-col p-6 min-h-screen bg-slate-50 animate-in fade-in duration-500 pb-20 justify-center">
-                    <div className="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl border border-slate-100 flex flex-col relative">
-                        <div className="bg-gradient-to-br from-indigo-500 via-sky-500 to-emerald-400 p-8 text-center relative overflow-hidden">
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 blur-2xl"></div>
-                            <CheckCircle2 size={48} className="text-white mx-auto mb-4 drop-shadow-lg" />
-                            <h2 className="text-white font-black text-2xl">KYC Verified!</h2>
-                            <p className="text-white/80 text-[10px] font-black uppercase tracking-widest mt-1">Identity Confirmed Successfully</p>
+                <div className="flex flex-col p-5 max-h-[90vh] bg-slate-50 animate-in fade-in duration-500 pb-20 justify-center">
+                    <div className="bg-white rounded-[2rem] overflow-hidden shadow-2xl border border-slate-100 flex flex-col relative scale-[0.95]">
+                        <div className="bg-gradient-to-br from-indigo-500 via-sky-500 to-emerald-400 p-6 text-center relative overflow-hidden">
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 blur-2xl"></div>
+                            <CheckCircle2 size={40} className="text-white mx-auto mb-3 drop-shadow-lg" />
+                            <h2 className="text-white font-black text-xl tracking-tight">KYC Verified!</h2>
+                            <p className="text-white/80 text-[10px] font-black uppercase tracking-widest mt-1">Identity Confirmed</p>
                         </div>
 
-                        <div className="p-8 text-center">
-                            <p className="text-slate-400 text-sm font-bold mb-8 leading-relaxed">
+                        <div className="p-6 text-center">
+                            <p className="text-slate-400 text-[13px] font-bold mb-6 leading-relaxed">
                                 "Congratulations! Your account is verified. To unlock 6+ income methods, purchase our premium access course today."
                             </p>
 
-                            <div className="bg-sky-50 rounded-3xl p-6 border border-sky-100 mb-8 flex items-center justify-between">
+                            <div className="bg-sky-50 rounded-2xl p-4 border border-sky-100 mb-6 flex items-center justify-between">
                                 <div className="text-left">
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Enrollment Fee</p>
-                                    <p className="text-3xl font-black text-sky-600">₹499</p>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Enrollment Fee</p>
+                                    <p className="text-2xl font-black text-sky-600 mt-1 leading-none">₹499</p>
                                 </div>
-                                <div className="bg-white px-3 py-1 rounded-xl shadow-sm">
-                                    <span className="text-[10px] font-black text-emerald-500">LIFE ACCESS</span>
+                                <div className="bg-white px-3 py-1 rounded-lg border border-sky-100">
+                                    <span className="text-[10px] font-black text-emerald-500 tracking-tighter">LIFE ACCESS</span>
                                 </div>
                             </div>
 
                             <button
                                 onClick={() => setIsPaymentOpen(true)}
-                                className="w-full bg-slate-900 hover:bg-black active:scale-95 text-white font-black uppercase tracking-widest py-5 rounded-2xl flex items-center justify-center gap-3 shadow-xl transition-all shadow-slate-200"
+                                className="w-full bg-slate-900 hover:bg-black active:scale-95 text-white font-black uppercase tracking-widest py-3.5 rounded-xl flex items-center justify-center gap-3 shadow-xl transition-all shadow-slate-100 text-xs"
                             >
-                                <Zap size={18} fill="currentColor" className="text-sky-400" />
+                                <Zap size={16} fill="currentColor" className="text-sky-400" />
                                 Buy Course & Unlock
                             </button>
                         </div>
@@ -296,7 +296,7 @@ const Income = () => {
 
     // ── LAYER 4: Final Income Cards (Modern Mobile UI Redesign) ─────────────
     return (
-        <div className="flex flex-col gap-5 p-5 bg-[#F8FAFC] animate-in fade-in duration-700 pb-20">
+        <div className="flex flex-col gap-5 p-5 bg-[#F8FAFC] animate-in fade-in duration-700">
             {/* Minimal Sub-Header */}
             <div className="flex items-center justify-between px-1">
                 <div>
@@ -309,13 +309,13 @@ const Income = () => {
             </div>
 
             {/* Main Referral Highlight Card (Full Width) */}
-            <div 
+            <div
                 onClick={() => handleCardClick(INCOME_OPTIONS[0].route)}
                 className="w-full p-4 rounded-[1.25rem] bg-gradient-to-br from-blue-600 via-blue-500 to-emerald-400 shadow-xl shadow-blue-100 flex flex-col relative overflow-hidden group active:scale-[0.98] transition-all cursor-pointer"
             >
                 {/* Abstract Background Glow */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl translate-x-10 -translate-y-10 group-hover:scale-150 transition-transform duration-1000"></div>
-                
+
                 <div className="flex justify-between items-start relative z-10">
                     <div className="bg-white/20 backdrop-blur-md p-2.5 rounded-2xl border border-white/30">
                         <Share2 size={20} className="text-white" />
@@ -343,7 +343,7 @@ const Income = () => {
                         <div
                             key={opt.id}
                             onClick={() => handleCardClick(opt.route)}
-                            className={`${opt.bg} border border-slate-100 rounded-[1.25rem] p-4 flex flex-col items-center text-center shadow-md shadow-slate-100/30 hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer relative overflow-hidden group`}
+                            className={`${opt.bg} border ${opt.borderColor || 'border-slate-100'} rounded-[1.25rem] p-4 flex flex-col items-center text-center shadow-md shadow-slate-100/30 hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer relative overflow-hidden group`}
                         >
                             {/* Centered Top Icon */}
                             <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center mb-3 shadow-sm border border-black/[0.03] group-hover:scale-110 transition-transform">
@@ -361,38 +361,29 @@ const Income = () => {
                             {/* Progress Bar for Future Fund */}
                             {opt.hasProgress && (
                                 <div className="w-full h-1 bg-indigo-100 rounded-full mb-3 overflow-hidden">
-                                     <div className="w-[45%] h-full bg-indigo-500 rounded-full animate-pulse shadow-sm"></div>
+                                    <div className="w-[45%] h-full bg-indigo-500 rounded-full animate-pulse shadow-sm"></div>
                                 </div>
                             )}
 
                             {/* CTA Button */}
-                            <button className="w-full bg-[#1A1C30] hover:bg-slate-900 text-[9px] font-bold text-white py-2.5 rounded-xl uppercase tracking-widest shadow-md relative z-10 transition-colors">
-                                {opt.locked ? 'Locked' : opt.cta}
+                            <button className={`w-full ${opt.locked ? 'bg-slate-100 text-slate-400' : 'bg-slate-900 hover:bg-black text-white shadow-md shadow-slate-200'} text-[9px] font-bold py-2.5 rounded-xl uppercase tracking-widest relative z-10 transition-all active:scale-95`}>
+                                {opt.locked ? 'Coming Soon' : opt.cta}
                             </button>
-
-                            {/* Lock Overlay */}
-                            {opt.locked && (
-                                <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] flex items-center justify-center z-20">
-                                    <div className="bg-slate-900 text-white rounded-full p-2 shadow-lg">
-                                        <Lock size={12} />
-                                    </div>
-                                </div>
-                            )}
                         </div>
                     );
                 })}
             </div>
 
-            {/* Refined Pro Tip Card (Matching new UI) */}
-            <div className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
-                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0 border border-indigo-100">
-                    <Sparkles size={20} className="text-indigo-500" />
+            {/* Refined Project Info Card */}
+            <div className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm relative overflow-hidden group mb-4">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-sky-500/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+                <div className="w-10 h-10 bg-sky-50 rounded-xl flex items-center justify-center shrink-0 border border-sky-100">
+                    <Briefcase size={20} className="text-sky-500" />
                 </div>
                 <div>
-                    <p className="text-[10px] font-black text-slate-800 uppercase tracking-widest leading-none">Pro Earning Tip</p>
-                    <p className="text-[9px] font-medium text-slate-400 leading-tight mt-1">
-                        "Consistent engagement increases your future fund progress by 12% monthly."
+                    <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest leading-none">Drowmoney Projects</h4>
+                    <p className="text-[9px] font-bold text-slate-400 leading-tight mt-1">
+                        Access exclusive high-ticket affiliate projects and scale your monthly income with verified partners.
                     </p>
                 </div>
             </div>
