@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+/* Disable text selection and copy — native app feel */
+* {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+/* Allow text selection only in inputs and textareas */
+input, textarea, [contenteditable] {
+    -webkit-user-select: text;
+    user-select: text;
+}

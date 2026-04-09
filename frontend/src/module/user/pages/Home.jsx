@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { 
-    IndianRupee, Coins, Users, CreditCard, ChevronRight, Zap, 
-    Wallet, Sparkles, Send, Trophy, Gift, Shield, Rocket, CheckCircle2
+import {
+    IndianRupee, Coins, Users, CreditCard, ChevronRight, Zap,
+    Wallet, Sparkles, Send, Trophy, Gift, Shield, Rocket, CheckCircle2, BarChart2, ClipboardList, ChevronDown
 } from 'lucide-react';
+import PaymentModal from '../components/PaymentModal';
 
 const BANNERS = [
     {
@@ -96,7 +97,7 @@ const AdBanners = ({ navigate }) => {
 // --- Custom Social Icons (SVG) to avoid library issues ---
 const FacebookIcon = () => (
     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-        <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3l-.5 3h-2.5v6.8c4.56-.93 8-4.96 8-9.8z"/>
+        <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3l-.5 3h-2.5v6.8c4.56-.93 8-4.96 8-9.8z" />
     </svg>
 );
 
@@ -110,14 +111,24 @@ const InstagramIcon = () => (
 
 const XIcon = () => (
     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.451-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/>
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.451-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z" />
     </svg>
 );
 
 const Home = () => {
-    const { userData, simulateSale, addNotification } = useUser();
+    const { userData, addNotification } = useUser();
     const { earnings, coins, referrals, futureFund, boosterDaysLeft, isBoosterActive } = userData;
     const navigate = useNavigate();
+
+    // Custom States for Booster Cards
+    const [isSupportExpanded, setIsSupportExpanded] = useState(false);
+    const [isTaskExpanded, setIsTaskExpanded] = useState(false);
+    const [isFutureFundExpanded, setIsFutureFundExpanded] = useState(false);
+    const [paymentConfig, setPaymentConfig] = useState({ isOpen: false, plan: '', amount: 0 });
+
+    const handleBuy = (plan, amount) => {
+        setPaymentConfig({ isOpen: true, plan, amount });
+    };
 
     const handleCopy = () => {
         navigator.clipboard.writeText(referrals.link);
@@ -154,8 +165,8 @@ const Home = () => {
                 <div className="grid grid-cols-4 gap-3">
                     {[
                         { icon: Send, label: 'Refer', color: 'bg-emerald-50 text-emerald-600', path: '/user/income' },
-                        { icon: Coins, label: 'Earn', color: 'bg-amber-50 text-amber-600', path: '/user/earn' },
-                        { icon: Wallet, label: 'Payout', color: 'bg-rose-50 text-rose-600', path: '/user/wallet' },
+                        { icon: ClipboardList, label: 'Task', color: 'bg-amber-50 text-amber-600', path: '/user/earn' },
+                        { icon: BarChart2, label: 'Fund', color: 'bg-violet-50 text-violet-600', path: '/user/future-fund' },
                         { icon: Sparkles, label: 'Events', color: 'bg-indigo-50 text-indigo-600', path: '/user/events' }
                     ].map((action, i) => (
                         <button
@@ -171,88 +182,180 @@ const Home = () => {
                     ))}
                 </div>
 
-                {/* --- Coins Section --- */}
-                <div className="bg-white border border-amber-100 rounded-2xl p-4 flex items-center justify-between group shadow-sm hover:border-amber-300 hover:shadow-md transition-all">
-                    <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center border border-amber-100 group-hover:rotate-12 transition-transform">
-                            <Coins className="text-amber-500" size={26} />
-                        </div>
-                        <div>
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">My Coin Balance</p>
-                            <div className="flex items-baseline gap-1.5">
-                                <h3 className="text-2xl font-black text-slate-800 leading-none">{coins.total}</h3>
-                                <span className="text-[10px] font-bold text-slate-400 uppercase italic">Coins</span>
+                {/* --- ₹11 Support Booster Section --- */}
+                <div className="bg-[#FFFBEB] border border-amber-100 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-md transition-all">
+                    <div className="p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-amber-50">
+                                <Coins className="text-amber-500" size={24} />
+                            </div>
+                            <div>
+                                <h4 className="text-[14px] font-black text-amber-900 tracking-tight leading-none">₹11 Support Booster</h4>
+                                <p className="text-[10px] font-bold text-amber-600/70 mt-1">Boost participation & win more!</p>
                             </div>
                         </div>
-                    </div>
-                    <button
-                        onClick={() => navigate('/user/earn')}
-                        className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md shadow-amber-100 flex items-center gap-1.5 active:scale-95 transition-all"
-                    >
-                        Earn Coins <ChevronRight size={14} />
-                    </button>
-                </div>
-
-
-                {/* --- Revenue Booster --- */}
-                <div className="bg-sky-50 border border-sky-100/50 px-4 py-4 rounded-2xl flex items-center justify-between group">
-                    <div className="flex items-center gap-4">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ring-4 ring-white animate-in zoom-in duration-1000 ${isBoosterActive ? 'bg-sky-500 text-white' : 'bg-white text-sky-300'}`}>
-                            <Zap size={28} className={isBoosterActive ? 'animate-pulse' : ''} />
-                        </div>
-                        <div>
-                            <h4 className="text-sm font-black text-slate-700 uppercase leading-none tracking-tight">Boost Earnings 3X</h4>
-                            <p className="text-[10px] font-bold text-sky-500 mt-1 uppercase tracking-widest">{isBoosterActive ? `${boosterDaysLeft} Days Remaining` : 'Increase Coin Value Now'}</p>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setIsSupportExpanded(!isSupportExpanded)}
+                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isSupportExpanded ? 'bg-amber-200 text-amber-900 rotate-180' : 'bg-white text-slate-300'}`}
+                            >
+                                <ChevronDown size={18} strokeWidth={2.5} />
+                            </button>
+                            <button
+                                onClick={() => handleBuy('Support Booster', 11)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-tight shadow-lg shadow-blue-100 active:scale-95 transition-all"
+                            >
+                                Buy Now
+                            </button>
                         </div>
                     </div>
-                    {!isBoosterActive && (
-                        <button
-                            onClick={() => navigate('/user/events')}
-                            className="p-1.5 bg-white border border-sky-200 text-sky-500 rounded-xl hover:bg-sky-500 hover:text-white transition-all shadow-sm active:scale-90"
-                        >
-                            <ChevronRight size={20} />
-                        </button>
+                    {isSupportExpanded && (
+                        <div className="px-4 pb-4 animate-in slide-in-from-top-2 duration-300">
+                            <div className="bg-white/50 rounded-2xl p-3 border border-amber-50 space-y-2.5">
+                                {[
+                                    { icon: Sparkles, text: '2X Winning Chance' },
+                                    { icon: Trophy, text: 'Priority Event Support' },
+                                    { icon: Shield, text: 'Support Badge Profile' }
+                                ].map((benefit, i) => (
+                                    <div key={i} className="flex items-center gap-2">
+                                        <div className="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center">
+                                            <benefit.icon size={10} className="text-amber-600" />
+                                        </div>
+                                        <span className="text-[11px] font-bold text-amber-900/80">{benefit.text}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <button onClick={() => navigate('/user/earn')} className="w-full mt-3 py-2 text-[10px] font-black text-amber-600 uppercase tracking-widest hover:underline flex items-center justify-center gap-1">
+                                My Coins: {coins.total} • Earn More <ChevronRight size={12} />
+                            </button>
+                        </div>
                     )}
                 </div>
 
-                {/* --- Future Fund Preview Card --- */}
-                <div 
-                    onClick={() => navigate('/user/future-fund')}
-                    className="bg-white border border-slate-50 rounded-2xl p-5 shadow-sm border-b-4 border-slate-100 cursor-pointer active:scale-[0.98] transition-all relative overflow-hidden group"
-                >
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-sky-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50"></div>
-                    
-                    <div className="flex justify-between items-start mb-4 relative z-10">
-                        <div>
-                            <div className="flex items-center gap-2 mb-1">
-                                <h3 className="text-lg font-black text-slate-800 tracking-tight">FUTURE FUND</h3>
+                {/* --- ₹49 Task Booster Section --- */}
+                <div className="bg-sky-50/50 border border-sky-100 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-md transition-all">
+                    <div className="p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-sky-50">
+                                <Zap className="text-sky-500" size={24} />
                             </div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Eligibility Tracking Active</p>
+                            <div>
+                                <h4 className="text-[14px] font-black text-sky-900 tracking-tight leading-none">₹49 Task Booster</h4>
+                                <p className="text-[10px] font-bold text-sky-600/70 mt-1">Increase coin value 3X now!</p>
+                            </div>
                         </div>
-                        <div className="bg-sky-50 text-sky-600 font-black text-xs px-3 py-1.5 rounded-xl border border-sky-100 shadow-sm">
-                            {futureFund.progress}%
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setIsTaskExpanded(!isTaskExpanded)}
+                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isTaskExpanded ? 'bg-sky-200 text-sky-900 rotate-180' : 'bg-white text-slate-300'}`}
+                            >
+                                <ChevronDown size={18} strokeWidth={2.5} />
+                            </button>
+                            <button
+                                onClick={() => handleBuy('Task Booster', 49)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-tight shadow-lg shadow-blue-100 active:scale-95 transition-all"
+                            >
+                                Buy Now
+                            </button>
                         </div>
                     </div>
-
-                    <div className="relative z-10">
-                        <div className="w-full h-2.5 bg-slate-50 rounded-full mb-3 relative overflow-hidden border border-slate-100 p-0.5">
-                            <div
-                                className="h-full bg-gradient-to-r from-emerald-400 via-sky-400 to-sky-600 rounded-full transition-all duration-1000 ease-out shadow-inner"
-                                style={{ width: `${futureFund.progress}%` }}
-                            ></div>
+                    {isTaskExpanded && (
+                        <div className="px-4 pb-4 animate-in slide-in-from-top-2 duration-300">
+                            <div className="bg-white/50 rounded-2xl p-3 border border-sky-50 space-y-2.5">
+                                {[
+                                    { icon: Zap, text: '3X Coin Multiplier' },
+                                    { icon: ClipboardList, text: 'Instant Task Approval' },
+                                    { icon: Rocket, text: 'Withdrawal Priority' }
+                                ].map((benefit, i) => (
+                                    <div key={i} className="flex items-center gap-2">
+                                        <div className="w-5 h-5 bg-sky-100 rounded-full flex items-center justify-center">
+                                            <benefit.icon size={10} className="text-sky-600" />
+                                        </div>
+                                        <span className="text-[11px] font-bold text-sky-900/80">{benefit.text}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="mt-3 px-3 py-2 bg-sky-100/50 rounded-xl text-center">
+                                <p className="text-[10px] font-black text-sky-600 uppercase tracking-widest leading-none">Valid for 30 Days</p>
+                            </div>
                         </div>
-                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-sky-500">
-                            <span>Track Progress</span>
-                            <ChevronRight size={14} />
+                    )}
+                </div>
+
+                {/* --- Future Fund Preview Card (Enhanced) --- */}
+                <div 
+                    className="bg-white border border-slate-100 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-md transition-all relative group"
+                >
+                    <div className="p-5">
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 className="text-[15px] font-black text-slate-800 tracking-tight flex items-center gap-1.5 uppercase">
+                                    Future Fund
+                                </h3>
+                                <p className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest mt-0.5">Eligibility Active</p>
+                            </div>
+                            
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setIsFutureFundExpanded(!isFutureFundExpanded); }}
+                                    className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isFutureFundExpanded ? 'bg-emerald-100 text-emerald-700 rotate-180' : 'bg-slate-50 text-slate-400 border border-slate-100'}`}
+                                >
+                                    <ChevronDown size={18} strokeWidth={2.5} />
+                                </button>
+                                <div className="bg-sky-50 text-sky-600 font-extrabold text-[11px] px-3 py-1.5 rounded-xl border border-sky-100 group-hover:scale-105 transition-transform">
+                                    {futureFund.progress}%
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="w-full h-2.5 bg-slate-50 rounded-full relative overflow-hidden border border-slate-100 p-0.5">
+                                <div
+                                    className="h-full bg-gradient-to-r from-emerald-400 via-sky-400 to-sky-600 rounded-full transition-all duration-1000 ease-out shadow-inner"
+                                    style={{ width: `${futureFund.progress}%` }}
+                                ></div>
+                            </div>
+
+                            {/* Expandable Benefits/Content */}
+                            {isFutureFundExpanded && (
+                                <div className="pt-2 pb-1 animate-in slide-in-from-top-2 duration-300">
+                                    <div className="bg-emerald-50/50 rounded-2xl p-3 border border-emerald-100/50 space-y-2.5">
+                                        {[
+                                            { icon: Sparkles, text: 'Monthly Compound Savings', color: 'text-emerald-500' },
+                                            { icon: Coins, text: 'Direct Platform Dividend', color: 'text-sky-500' },
+                                            { icon: Shield, text: 'One-Time Retirement Shield', color: 'text-indigo-500' }
+                                        ].map((item, i) => (
+                                            <div key={i} className="flex items-center gap-2.5">
+                                                <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                                    <item.icon size={11} className={item.color} />
+                                                </div>
+                                                <span className="text-[11px] font-bold text-slate-600 tracking-tight">{item.text}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <p className="px-1 mt-3 text-[10px] font-bold text-slate-400 leading-relaxed italic">
+                                        * Unlock lifetime financial security once progress reaches 100%. Keep earning to grow!
+                                    </p>
+                                </div>
+                            )}
+
+                            <button 
+                                onClick={() => navigate('/user/future-fund')}
+                                className="w-full flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-[#2D9AFF] bg-sky-50/50 p-3 rounded-2xl hover:bg-sky-50 transition-colors"
+                            >
+                                <span>Track Detailed Progress</span>
+                                <ChevronRight size={14} />
+                            </button>
                         </div>
                     </div>
                 </div>
+
 
                 {/* --- Lifetime Service Info --- */}
                 <div className="w-full bg-gradient-to-br from-slate-900 via-slate-800 to-sky-900 rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                     <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
-                    
+
                     <div className="relative z-10 flex flex-col gap-5">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/10">
@@ -330,6 +433,17 @@ const Home = () => {
                     <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em]">© 2026 Drowmoney • All rights reserved</p>
                 </div>
             </footer>
+
+            <PaymentModal 
+                isOpen={paymentConfig.isOpen}
+                onClose={() => setPaymentConfig({ ...paymentConfig, isOpen: false })}
+                plan={paymentConfig.plan}
+                amount={paymentConfig.amount}
+                onSuccess={() => {
+                    setPaymentConfig({ ...paymentConfig, isOpen: false });
+                    addNotification("Success!", `${paymentConfig.plan} activated.`, "success");
+                }}
+            />
         </div>
     );
 };
