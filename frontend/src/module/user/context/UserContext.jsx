@@ -4,9 +4,18 @@ import { MOCK_USER, NOTIFICATIONS } from '../data/mockData';
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-    const [userData, setUserData] = useState(MOCK_USER);
+    const [userData, setUserData] = useState(() => {
+        const saved = localStorage.getItem('dromoney_user_data');
+        if (saved) return JSON.parse(saved);
+        return MOCK_USER;
+    });
     const [notifications, setNotifications] = useState(NOTIFICATIONS);
     const [joinedEvents, setJoinedEvents] = useState([]);
+
+    // Persist userData on every change
+    React.useEffect(() => {
+        localStorage.setItem('dromoney_user_data', JSON.stringify(userData));
+    }, [userData]);
 
     // --- Actions ---
 
@@ -117,7 +126,12 @@ export const UserProvider = ({ children }) => {
         return true;
     };
 
-    // 8. Add/Clear Notifications
+    // 9. Update Profile Image
+    const updateProfileImage = (imgBase64) => {
+        setUserData(prev => ({ ...prev, profileImage: imgBase64 }));
+    };
+
+    // 10. Add/Clear Notifications
     const addNotification = (title, message, type) => {
         setNotifications(prev => [{ id: Date.now(), title, message, time: "Just now", type }, ...prev]);
     };
@@ -134,6 +148,7 @@ export const UserProvider = ({ children }) => {
         upgradeBooster,
         simulateSale,
         requestWithdrawal,
+        updateProfileImage,
         addNotification,
         clearNotifications
     }), [userData, notifications, joinedEvents]);

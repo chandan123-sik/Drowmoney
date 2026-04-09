@@ -3,7 +3,7 @@ import { useUser } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import {
     IndianRupee, Coins, Users, CreditCard, ChevronRight, Zap,
-    Wallet, Sparkles, Send, Trophy, Gift, Shield, Rocket, CheckCircle2, BarChart2, ClipboardList, ChevronDown
+    Wallet, Sparkles, Send, Trophy, Gift, Shield, Rocket, CheckCircle2, BarChart2, ClipboardList, ChevronDown, Share2, TrendingUp
 } from 'lucide-react';
 import PaymentModal from '../components/PaymentModal';
 
@@ -59,8 +59,7 @@ const AdBanners = ({ navigate }) => {
     return (
         <div className="relative">
             <div
-                className={`bg-gradient-to-r ${banner.gradient} rounded-2xl p-4 shadow-lg relative overflow-hidden transition-all duration-500 group cursor-pointer`}
-                onClick={() => navigate(banner.path)}
+                className={`bg-gradient-to-r ${banner.gradient} rounded-2xl p-4 shadow-lg relative overflow-hidden transition-all duration-500 group`}
             >
                 {/* Background Icon */}
                 <div className="absolute -right-4 -bottom-4 opacity-10">
@@ -161,13 +160,49 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* --- Quick Actions Grid --- */}
-                <div className="grid grid-cols-4 gap-3">
+                {/* --- Future Fund Preview Card (Moved up as requested) --- */}
+                <div 
+                    onClick={() => navigate('/user/income#fund')}
+                    className="bg-white border border-slate-100 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-md transition-all relative group cursor-pointer active:scale-[0.98]"
+                >
+                    <div className="p-5">
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 className="text-[15px] font-black text-slate-800 tracking-tight flex items-center gap-1.5 uppercase">
+                                    Future Fund
+                                </h3>
+                                <p className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest mt-0.5">Eligibility Active</p>
+                            </div>
+                            
+                            <div className="flex items-center gap-2">
+                                <div className="bg-sky-50 text-sky-600 font-extrabold text-[11px] px-3 py-1.5 rounded-xl border border-sky-100 group-hover:scale-105 transition-transform">
+                                    {futureFund.progress}%
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="w-full h-2.5 bg-slate-50 rounded-full relative overflow-hidden border border-slate-100 p-0.5">
+                                <div
+                                    className="h-full bg-gradient-to-r from-emerald-400 via-sky-400 to-sky-600 rounded-full transition-all duration-1000 ease-out shadow-inner"
+                                    style={{ width: `${futureFund.progress}%` }}
+                                ></div>
+                            </div>
+                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-[#2D9AFF]">
+                                <span>Track Progress</span>
+                                <ChevronRight size={14} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* --- Quick Actions Grid (Updated paths to hash navigation) --- */}
+                <div className="grid grid-cols-4 gap-2 mb-2">
                     {[
-                        { icon: Send, label: 'Refer', color: 'bg-emerald-50 text-emerald-600', path: '/user/income' },
-                        { icon: ClipboardList, label: 'Task', color: 'bg-amber-50 text-amber-600', path: '/user/earn' },
-                        { icon: BarChart2, label: 'Fund', color: 'bg-violet-50 text-violet-600', path: '/user/future-fund' },
-                        { icon: Sparkles, label: 'Events', color: 'bg-indigo-50 text-indigo-600', path: '/user/events' }
+                        { icon: Share2, label: 'Refer', color: 'bg-blue-50 text-blue-600', path: '/user/income-info#refer' },
+                        { icon: ClipboardList, label: 'Task', color: 'bg-emerald-50 text-emerald-600', path: '/user/income-info#task' },
+                        { icon: TrendingUp, label: 'Fund', color: 'bg-sky-50 text-sky-600', path: '/user/income-info#fund' },
+                        { icon: Sparkles, label: 'Events', color: 'bg-indigo-50 text-indigo-600', path: '/user/income-info#events' }
                     ].map((action, i) => (
                         <button
                             key={i}
@@ -282,73 +317,11 @@ const Home = () => {
                     )}
                 </div>
 
-                {/* --- Future Fund Preview Card (Enhanced) --- */}
-                <div 
-                    className="bg-white border border-slate-100 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-md transition-all relative group"
-                >
-                    <div className="p-5">
-                        <div className="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 className="text-[15px] font-black text-slate-800 tracking-tight flex items-center gap-1.5 uppercase">
-                                    Future Fund
-                                </h3>
-                                <p className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest mt-0.5">Eligibility Active</p>
-                            </div>
-                            
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); setIsFutureFundExpanded(!isFutureFundExpanded); }}
-                                    className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isFutureFundExpanded ? 'bg-emerald-100 text-emerald-700 rotate-180' : 'bg-slate-50 text-slate-400 border border-slate-100'}`}
-                                >
-                                    <ChevronDown size={18} strokeWidth={2.5} />
-                                </button>
-                                <div className="bg-sky-50 text-sky-600 font-extrabold text-[11px] px-3 py-1.5 rounded-xl border border-sky-100 group-hover:scale-105 transition-transform">
-                                    {futureFund.progress}%
-                                </div>
-                            </div>
-                        </div>
+                {/* --- Future Fund Section was here, moved up --- */}
 
-                        <div className="space-y-4">
-                            <div className="w-full h-2.5 bg-slate-50 rounded-full relative overflow-hidden border border-slate-100 p-0.5">
-                                <div
-                                    className="h-full bg-gradient-to-r from-emerald-400 via-sky-400 to-sky-600 rounded-full transition-all duration-1000 ease-out shadow-inner"
-                                    style={{ width: `${futureFund.progress}%` }}
-                                ></div>
-                            </div>
 
-                            {/* Expandable Benefits/Content */}
-                            {isFutureFundExpanded && (
-                                <div className="pt-2 pb-1 animate-in slide-in-from-top-2 duration-300">
-                                    <div className="bg-emerald-50/50 rounded-2xl p-3 border border-emerald-100/50 space-y-2.5">
-                                        {[
-                                            { icon: Sparkles, text: 'Monthly Compound Savings', color: 'text-emerald-500' },
-                                            { icon: Coins, text: 'Direct Platform Dividend', color: 'text-sky-500' },
-                                            { icon: Shield, text: 'One-Time Retirement Shield', color: 'text-indigo-500' }
-                                        ].map((item, i) => (
-                                            <div key={i} className="flex items-center gap-2.5">
-                                                <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-sm">
-                                                    <item.icon size={11} className={item.color} />
-                                                </div>
-                                                <span className="text-[11px] font-bold text-slate-600 tracking-tight">{item.text}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <p className="px-1 mt-3 text-[10px] font-bold text-slate-400 leading-relaxed italic">
-                                        * Unlock lifetime financial security once progress reaches 100%. Keep earning to grow!
-                                    </p>
-                                </div>
-                            )}
+                {/* --- Future Fund Section was here, moved up --- */}
 
-                            <button 
-                                onClick={() => navigate('/user/future-fund')}
-                                className="w-full flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-[#2D9AFF] bg-sky-50/50 p-3 rounded-2xl hover:bg-sky-50 transition-colors"
-                            >
-                                <span>Track Detailed Progress</span>
-                                <ChevronRight size={14} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
 
 
                 {/* --- Lifetime Service Info --- */}

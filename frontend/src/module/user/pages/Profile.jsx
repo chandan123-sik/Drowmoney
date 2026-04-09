@@ -11,10 +11,9 @@ import FeedbackModal from '../components/FeedbackModal';
 
 const Profile = () => {
     const navigate = useNavigate();
-    const { userData, addNotification, upgradeBooster } = useUser();
-    const { name, id, referrals, isBoosterActive, isPaid } = userData;
+    const { userData, addNotification, upgradeBooster, updateProfileImage } = useUser();
+    const { name, id, referrals, isBoosterActive, isPaid, profileImage } = userData;
     const [isUnlockOpen, setIsUnlockOpen] = useState(false);
-    const [profileImg, setProfileImg] = useState(null);
     const [paymentConfig, setPaymentConfig] = useState({ isOpen: false, plan: '', amount: 0 });
     const [isKycOpen, setIsKycOpen] = useState(false);
     const [isReferralsOpen, setIsReferralsOpen] = useState(false);
@@ -69,7 +68,7 @@ const Profile = () => {
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setProfileImg(reader.result);
+                updateProfileImage(reader.result);
                 addNotification("Success!", "Profile photo updated.", "success");
             };
             reader.readAsDataURL(file);
@@ -108,8 +107,8 @@ const Profile = () => {
                 <label className="relative cursor-pointer group mb-3">
                     <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                     <div className="relative w-20 h-20 bg-white rounded-full flex items-center justify-center ring-4 ring-white shadow-xl shadow-slate-200/50 overflow-hidden transition-transform group-active:scale-95">
-                        {profileImg ? (
-                            <img src={profileImg} alt="Profile" className="w-full h-full object-cover" />
+                        {profileImage ? (
+                            <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
                         ) : (
                             <div className="w-full h-full bg-slate-100 flex items-center justify-center">
                                 <User size={32} className="text-slate-400" />
