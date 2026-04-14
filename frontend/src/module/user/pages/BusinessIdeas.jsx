@@ -1,73 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { 
     Briefcase, ChevronLeft, Sparkles, Star, 
     Gift, ArrowRight, CheckCircle2, TrendingUp,
-    Globe, Rocket, ShoppingCart, Zap, Lock
+    Rocket, Zap, Lock, Trophy, Shield, 
+    Users, ClipboardList, CreditCard
 } from 'lucide-react';
+import { BusinessDataService } from '../../../services/BusinessDataService';
+
+// Icon Map for dynamic rendering - using only confirmed working icons
+const ICON_MAP = {
+    TrendingUp, Rocket, Zap, Trophy,
+    Sparkles, Gift, Shield, Users, 
+    Briefcase, ClipboardList, CreditCard
+};
 
 const BusinessIdeas = () => {
     const navigate = useNavigate();
-    const { userData } = useUser();
-    const { isPaid } = userData;
+    const { userData, unlockPlatform } = useUser();
     const [activeTab, setActiveTab] = useState('free');
+    const [unlockedIdeas, setUnlockedIdeas] = useState([]);
+    const [viewIdea, setViewIdea] = useState(null);
+    const [showPayment, setShowPayment] = useState(null);
+    const [allIdeas, setAllIdeas] = useState([]);
 
-    const FREE_IDEAS = [
-        {
-            id: 1,
-            title: "Affiliate Marketing",
-            desc: "Start promoting digital products via social media without any investment.",
-            potential: "₹10k - ₹30k / mo",
-            icon: TrendingUp,
-            color: "text-emerald-500",
-            bg: "bg-emerald-50"
-        },
-        {
-            id: 2,
-            title: "Content Writing",
-            desc: "Freelance writing for blogs and companies. Use your language skills.",
-            potential: "₹5k - ₹20k / mo",
-            icon: Globe,
-            color: "text-blue-500",
-            bg: "bg-blue-50"
-        },
-        {
-            id: 3,
-            title: "Re-selling Business",
-            desc: "Use platforms like Meesho or eBay to sell products on WhatsApp.",
-            potential: "₹8k - ₹15k / mo",
-            icon: ShoppingCart,
-            color: "text-amber-500",
-            bg: "bg-amber-50"
-        }
-    ];
+    useEffect(() => {
+        setAllIdeas(BusinessDataService.getIdeas());
+    }, []);
 
-    const PREMIUM_IDEAS = [
-        {
-            id: 1,
-            title: "Premium SaaS Agency",
-            desc: "Build and sell custom software solutions for local businesses.",
-            potential: "₹50k - ₹2L+ / mo",
-            icon: Rocket,
-            color: "text-purple-500",
-            bg: "bg-purple-50",
-            locked: true
-        },
-        {
-            id: 2,
-            title: "Dropshipping Master",
-            desc: "Setup a high-conversion Shopify store and run global ads.",
-            potential: "₹1L - ₹5L+ / mo",
-            icon: Zap,
-            color: "text-sky-500",
-            bg: "bg-sky-50",
-            locked: true
+    const freeIdeas = allIdeas.filter(i => i.type === 'Free');
+    const premiumIdeas = allIdeas.filter(i => i.type === 'Premium');
+
+    const handlePaymentSuccess = () => {
+        if (showPayment) {
+            setUnlockedIdeas(prev => [...prev, showPayment]);
         }
-    ];
+        unlockPlatform();
+        setShowPayment(null);
+    };
+
+    const renderIcon = (iconName, size = 28) => {
+        const IconComponent = ICON_MAP[iconName] || Briefcase;
+        return <IconComponent size={size} />;
+    };
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#F8FAFC] animate-in fade-in duration-500 pb-6">
+        <div className="flex flex-col min-h-screen bg-[#F8FAFC] animate-in fade-in duration-500 pb-6 text-slate-900">
             {/* Header Section */}
             <div className="bg-white px-4 py-3 flex items-center justify-between sticky top-0 z-30 border-b border-slate-100">
                 <button 
@@ -104,13 +83,13 @@ const BusinessIdeas = () => {
                     </button>
                 </div>
 
-                <div className="mt-4 space-y-3 animate-in slide-in-from-bottom-4 duration-500">
+                <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {activeTab === 'free' ? (
-                        FREE_IDEAS.map((idea) => (
+                        freeIdeas.map((idea) => (
                             <div key={idea.id} className="bg-white rounded-2xl p-3.5 border border-slate-100 shadow-sm relative overflow-hidden group">
                                 <div className="flex items-start gap-3">
-                                    <div className={`w-14 h-14 ${idea.bg} rounded-2xl flex items-center justify-center ${idea.color} shadow-sm border border-black/5`}>
-                                        <idea.icon size={28} />
+                                    <div className={`w-14 h-14 ${idea.bg || 'bg-emerald-50'} rounded-2xl flex items-center justify-center ${idea.color || 'text-emerald-500'} shadow-sm border border-black/5`}>
+                                        {renderIcon(idea.icon)}
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex items-center justify-between">
@@ -119,14 +98,17 @@ const BusinessIdeas = () => {
                                                 <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">Active</span>
                                             </div>
                                         </div>
-                                        <p className="text-[12px] font-medium text-slate-400 mt-1 lines-clamp-2">{idea.desc}</p>
+                                        <p className="text-[12px] font-medium text-slate-400 mt-1 line-clamp-2">{idea.desc}</p>
                                         
                                         <div className="mt-4 flex items-center justify-between bg-slate-50/80 px-4 py-3 rounded-2xl border border-slate-100/50">
                                             <div>
                                                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Earning Potential</p>
                                                 <p className="text-[13px] font-bold text-emerald-600">{idea.potential}</p>
                                             </div>
-                                            <button className="bg-white text-slate-900 p-2 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-50 active:scale-90 transition-all">
+                                            <button 
+                                                onClick={() => setViewIdea(idea)}
+                                                className="bg-white text-slate-900 p-2 rounded-xl border border-slate-200 shadow-sm hover:bg-slate-50 active:scale-90 transition-all cursor-pointer"
+                                            >
                                                 <ArrowRight size={16} />
                                             </button>
                                         </div>
@@ -137,7 +119,7 @@ const BusinessIdeas = () => {
                     ) : (
                         <div className="space-y-6">
                             {/* Premium Banner */}
-                            {!isPaid && (
+                            {!unlockedIdeas.length && (
                                 <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[2rem] p-7 text-white shadow-xl shadow-indigo-100 relative overflow-hidden">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                                     <div className="flex items-center gap-3 mb-4">
@@ -153,47 +135,149 @@ const BusinessIdeas = () => {
                                 </div>
                             )}
 
-                            {PREMIUM_IDEAS.map((idea) => (
-                                <div key={idea.id} className={`bg-white rounded-2xl p-3.5 border border-slate-100 shadow-sm relative overflow-hidden group ${!isPaid ? 'opacity-60 grayscale filter' : ''}`}>
-                                    <div className="flex items-start gap-3">
-                                        <div className={`w-14 h-14 ${idea.bg} rounded-2xl flex items-center justify-center ${idea.color} border border-black/5`}>
-                                            <idea.icon size={28} />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex items-center justify-between">
-                                                <h3 className="text-base font-bold text-slate-900">{idea.title}</h3>
-                                                {!isPaid && <Lock size={16} className="text-slate-400" />}
+                            {premiumIdeas.map((idea) => {
+                                const isIdeaUnlocked = unlockedIdeas.includes(idea.id);
+                                return (
+                                    <div key={idea.id} className={`bg-white rounded-2xl p-3.5 border border-slate-100 shadow-sm relative overflow-hidden group ${!isIdeaUnlocked ? 'opacity-90' : ''}`}>
+                                        <div className="flex items-start gap-3">
+                                            <div className={`w-14 h-14 ${idea.bg || 'bg-indigo-50'} rounded-2xl flex items-center justify-center ${idea.color || 'text-indigo-500'} border border-black/5 shadow-sm`}>
+                                                {renderIcon(idea.icon)}
                                             </div>
-                                            <p className="text-[12px] font-medium text-slate-400 mt-1">{idea.desc}</p>
-                                            
-                                            {isPaid && (
-                                                <div className="mt-4 flex items-center justify-between bg-indigo-50/50 px-4 py-3 rounded-2xl border border-indigo-100/50">
+                                            <div className="flex-1">
+                                                <div className="flex items-center justify-between">
+                                                    <h3 className="text-base font-bold text-slate-900">{idea.title}</h3>
+                                                    {!isIdeaUnlocked && (
+                                                        <div className="bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 flex items-center gap-1.5">
+                                                            <Lock size={10} className="text-slate-400" />
+                                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Locked</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <p className="text-[12px] font-medium text-slate-400 mt-1">{idea.desc}</p>
+                                                
+                                                <div className={`mt-4 flex items-center justify-between px-4 py-3 rounded-2xl border transition-all ${isIdeaUnlocked ? 'bg-indigo-50/50 border-indigo-100/50' : 'bg-slate-50 border-slate-100'}`}>
                                                     <div>
                                                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Earning Potential</p>
-                                                        <p className="text-[13px] font-bold text-indigo-600">{idea.potential}</p>
+                                                        <p className={`text-[13px] font-bold ${isIdeaUnlocked ? 'text-indigo-600' : 'text-slate-400'}`}>{idea.potential}</p>
                                                     </div>
-                                                    <button className="bg-white text-indigo-600 p-2 rounded-xl border border-indigo-200 shadow-sm hover:bg-slate-50 active:scale-90 transition-all">
-                                                        <ArrowRight size={16} />
+                                                    <button 
+                                                        onClick={() => isIdeaUnlocked ? setViewIdea(idea) : setShowPayment(idea.id)}
+                                                        className={`p-2 rounded-xl border shadow-sm active:scale-95 transition-all flex items-center justify-center
+                                                            ${isIdeaUnlocked ? 'bg-white text-indigo-600 border-indigo-100' : 'bg-white text-slate-400 border-slate-200'}`}
+                                                    >
+                                                        {!isIdeaUnlocked ? <Lock size={16} /> : <ArrowRight size={16} />}
                                                     </button>
                                                 </div>
-                                            )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
-
-                            {!isPaid && (
-                                <button
-                                    onClick={() => navigate('/user/income')} 
-                                    className="w-full bg-[#1A1C30] text-white py-5 rounded-[1.75rem] text-[11px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-200 active:scale-95 transition-all"
-                                >
-                                    Upgrade to Unlock Ideas
-                                </button>
-                            )}
+                                );
+                            })}
                         </div>
                     )}
                 </div>
             </div>
+
+            {showPayment && (
+                <div className="fixed inset-0 z-[100] flex items-end justify-center px-4 pb-10 sm:items-center">
+                    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in transition-opacity" onClick={() => setShowPayment(null)}></div>
+                    
+                    {(() => {
+                        const ideaToPay = allIdeas.find(i => i.id === showPayment);
+                        const price = ideaToPay?.price || 20; // Fallback to 20 if none set
+
+                        return (
+                            <div className="w-full max-w-sm bg-white rounded-[2.5rem] p-8 shadow-2xl relative z-10 animate-in slide-in-from-bottom-10 duration-300 border border-slate-100">
+                                <div className="flex flex-col items-center text-center">
+                                    <div className="w-20 h-20 bg-indigo-50 rounded-[2rem] flex items-center justify-center text-indigo-600 mb-6 shadow-inner ring-4 ring-indigo-50/50">
+                                        <Sparkles size={36} />
+                                    </div>
+                                    <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase">Unlock Premium Strategy</h3>
+                                    <p className="text-[13px] font-bold text-slate-400 mt-2 px-2">Access the full blueprint for "{ideaToPay?.title}" and start earning today.</p>
+                                    
+                                    <div className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-5 my-8 flex items-center justify-between">
+                                        <p className="text-[12px] font-black text-slate-400 uppercase tracking-widest">Total Payable</p>
+                                        <p className="text-2xl font-black text-[#1A1C30]">₹{price}</p>
+                                    </div>
+
+                                    <div className="w-full space-y-3">
+                                        <button 
+                                            onClick={handlePaymentSuccess}
+                                            className="w-full bg-[#1A1C30] text-white py-5 rounded-2xl text-[12px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-200 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                        >
+                                            Pay ₹{price} & Unlock
+                                        </button>
+                                        <button 
+                                            onClick={() => setShowPayment(null)}
+                                            className="w-full bg-white text-slate-400 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:text-slate-600 active:scale-95 transition-all"
+                                        >
+                                            Cancel Transaction
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })()}
+                </div>
+            )}
+
+            {/* Idea Detail Overlay */}
+            {viewIdea && (
+                <div className="fixed inset-0 z-[60] flex flex-col bg-white animate-in slide-in-from-bottom duration-500 pb-10">
+                    <div className="p-6 relative overflow-hidden bg-slate-900 text-white">
+                        <div className="absolute top-0 right-0 p-8 opacity-10">
+                            {renderIcon(viewIdea.icon, 150)}
+                        </div>
+                        <button 
+                            onClick={() => setViewIdea(null)}
+                            className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20 mb-6 active:scale-95 transition-all relative z-10"
+                        >
+                            <ChevronLeft size={24} />
+                        </button>
+                        <div className="relative z-10">
+                            <h1 className="text-2xl font-black tracking-tight uppercase">{viewIdea.title}</h1>
+                            <div className="flex items-center gap-2 mt-2">
+                                <p className="text-[10px] font-black text-sky-400 uppercase tracking-widest">Success Roadmap</p>
+                                <div className="w-1 h-1 rounded-full bg-white/30"></div>
+                                <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">{viewIdea.potential}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8 bg-white rounded-t-[2.5rem] -mt-6 relative z-10 shadow-2xl">
+                        <div className="space-y-6">
+                            {viewIdea.steps?.map((step, idx) => (
+                                <div key={idx} className="flex gap-5 group">
+                                    <div className="flex flex-col items-center">
+                                        <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-black text-[12px] shadow-lg shadow-slate-200 shrink-0">
+                                            {idx + 1}
+                                        </div>
+                                        {idx !== viewIdea.steps.length - 1 && <div className="w-0.5 h-full bg-slate-100 my-2"></div>}
+                                    </div>
+                                    <div className="pb-4">
+                                        <h3 className="text-[15px] font-black text-slate-800 mb-1 leading-none">{step.title}</h3>
+                                        <p className="text-[12px] font-bold text-slate-400 leading-relaxed italic">{step.text}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-4 p-6 bg-emerald-50 rounded-[2rem] border border-emerald-100 flex items-center gap-4">
+                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm shrink-0">
+                                <CheckCircle2 size={24} />
+                            </div>
+                            <div>
+                                <p className="text-[13px] font-black text-slate-800 tracking-tight">Strategy Unlocked</p>
+                                <p className="text-[11px] font-bold text-slate-500/80 leading-tight">Start working on these steps to see real growth.</p>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={() => setViewIdea(null)}
+                            className="w-full bg-[#1A1C30] text-white py-5 rounded-[2rem] text-[12px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-200 mt-10 active:scale-95 transition-all"
+                        >
+                            Got it
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Bottom Info Banner */}
             <div className="px-2 mt-4">

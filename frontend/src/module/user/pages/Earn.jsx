@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
-import { TASKS } from '../data/mockData';
+import { taskStorage } from '../../shared/services/taskStorage';
 import { useNavigate } from 'react-router-dom';
 import {
     ChevronLeft, ChevronRight, ChevronDown,
     Monitor, Play, Lightbulb, Disc, MessageCircle,
     Camera, ThumbsUp, MessageSquare, Link2,
-    Coins, Bell, ClipboardList, TrendingUp, AlertCircle, Rocket, Zap
+    Coins, Bell, ClipboardList, TrendingUp, AlertCircle, Rocket, Zap, CheckCircle2
 } from 'lucide-react';
 import UnlockModal from '../components/UnlockModal';
 import PaymentModal from '../components/PaymentModal';
@@ -21,11 +21,8 @@ const ICON_MAP = {
     ThumbsUp: { el: ThumbsUp, bg: 'bg-rose-100', color: 'text-rose-500' },
     MessageSquare: { el: MessageSquare, bg: 'bg-cyan-100', color: 'text-cyan-500' },
     Link: { el: Link2, bg: 'bg-indigo-100', color: 'text-indigo-500' },
+    Camera: { el: Camera, bg: 'bg-pink-100', color: 'text-pink-500' },
 };
-
-const COMPLETED_COUNT = 3;
-const TOTAL_COUNT = 10;
-const REMAINING_COUNT = TOTAL_COUNT - COMPLETED_COUNT;
 
 const Earn = () => {
     const { userData } = useUser();
@@ -35,9 +32,26 @@ const Earn = () => {
     const [isPaymentOpen, setIsPaymentOpen] = useState(false);
     const navigate = useNavigate();
 
+    // DYNAMIC TASKS STATE
+    const [tasks, setTasks] = useState([]);
+    const [completedTasks, setCompletedTasks] = useState([]);
+
+    useEffect(() => {
+        setTasks(taskStorage.getTasks());
+        setCompletedTasks(taskStorage.getCompletedTasks());
+    }, []);
+
+    const totalCount = tasks.length;
+    const completedCount = completedTasks.length;
+    const remainingCount = totalCount - completedCount;
+
     const handleTaskClick = (task) => {
         if (!isPaid) {
             setIsUnlockOpen(true);
+            return;
+        }
+        if (completedTasks.includes(task.id)) {
+            // Do not open if already completed
             return;
         }
         navigate(`/user/task/${task.id}`);
@@ -71,14 +85,14 @@ const Earn = () => {
                     <div>
                         <p className="text-[13px] font-black text-slate-800">
                             Daily Tasks Avld{' '}
-                            <span className="text-slate-400 font-bold">Available: {TOTAL_COUNT}</span>
+                            <span className="text-slate-400 font-bold">Available: {totalCount}</span>
                         </p>
                         <div className="flex items-center gap-3 mt-1">
                             <span className="text-[11px] font-bold text-slate-500">
-                                Completed: <span className="text-emerald-500 font-black">{COMPLETED_COUNT}</span>
+                                Completed: <span className="text-emerald-500 font-black">{completedCount}</span>
                             </span>
                             <span className="text-[11px] font-bold text-slate-500">
-                                Remaining: <span className="text-orange-500 font-black">{REMAINING_COUNT}</span>
+                                Remaining: <span className="text-orange-500 font-black">{remainingCount}</span>
                             </span>
                         </div>
                     </div>
@@ -90,50 +104,61 @@ const Earn = () => {
 
                 {/* ── Task List ── */}
                 <div className="flex flex-col gap-0 mt-4">
-                    {TASKS.map((task) => {
+                    {tasks.map((task) => {
                         const iconConfig = ICON_MAP[task.icon] || ICON_MAP['Monitor'];
                         const IconEl = iconConfig.el;
                         const isHighlighted = task.actionType === 'highlighted';
+                        const isCompleted = completedTasks.includes(task.id);
 
                         return (
                             <div
                                 key={task.id}
                                 onClick={() => handleTaskClick(task)}
-                                className="bg-white border-b border-slate-100 px-4 py-3.5 flex items-center gap-3 active:bg-slate-50 transition-colors cursor-pointer"
+                                className={`bg-white border-b border-slate-100 px-4 py-3.5 flex items-center gap-3 transition-colors ${isCompleted ? 'opacity-60 cursor-default' : 'active:bg-slate-50 cursor-pointer hover:bg-slate-50'}`}
                             >
                                 {/* Icon */}
-                                <div className={`w-11 h-11 ${iconConfig.bg} rounded-xl flex items-center justify-center shrink-0`}>
-                                    <IconEl size={20} className={iconConfig.color} />
+                                <div className={`w-11 h-11 ${iconConfig.bg} rounded-xl flex items-center justify-center shrink-0 ${isCompleted ? 'grayscale opacity-50' : ''}`}>
+                                    {isCompleted ? <CheckCircle2 size={20} className="text-emerald-500" /> : <IconEl size={20} className={iconConfig.color} />}
                                 </div>
 
                                 {/* Text */}
                                 <div className="flex-1 min-w-0">
-                                    <h4 className="text-[13px] font-black text-slate-800 leading-tight">{task.title}</h4>
+                                    <h4 className={`text-[13px] font-black leading-tight ${isCompleted ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{task.title}</h4>
                                     <p className="text-[10px] font-bold text-slate-400 mt-0.5 leading-none truncate">{task.description}</p>
                                 </div>
 
                                 {/* Right side */}
                                 <div className="flex flex-col items-end gap-1.5 shrink-0">
                                     {/* Reward */}
-                                    <span className={`text-[10px] font-black leading-tight ${isHighlighted ? 'text-orange-500' : 'text-slate-500'}`}>
-                                        {task.reward}
+                                    <span className={`text-[10px] font-black leading-tight ${isCompleted ? 'text-emerald-500' : isHighlighted ? 'text-orange-500' : 'text-slate-500'}`}>
+                                        {isCompleted ? 'Done' : `${task.reward} Coins`}
                                     </span>
                                     {/* Action Button */}
-                                    <button
-                                        className={`text-[10px] font-black px-3 py-1.5 rounded-lg transition-all active:scale-95 ${isHighlighted
-                                                ? 'bg-amber-400 text-white shadow-md shadow-amber-100'
-                                                : 'bg-blue-600 text-white shadow-md shadow-blue-100'
-                                            }`}
-                                        onClick={(e) => { e.stopPropagation(); handleTaskClick(task); }}
-                                    >
-                                        {task.actionText}
-                                    </button>
+                                    {isCompleted ? (
+                                        <button disabled className="text-[10px] font-black px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-500 border border-emerald-100/50 flex items-center gap-1">
+                                            Completed
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className={`text-[10px] font-black px-3 py-1.5 rounded-lg transition-all active:scale-95 ${isHighlighted
+                                                    ? 'bg-amber-400 text-white shadow-md shadow-amber-100 hover:bg-amber-500'
+                                                    : 'bg-blue-600 text-white shadow-md shadow-blue-100 hover:bg-blue-700'
+                                                }`}
+                                            onClick={(e) => { e.stopPropagation(); handleTaskClick(task); }}
+                                        >
+                                            {task.type === 'Spin' ? 'Spin Now >' : task.type === 'Proof' ? 'Upload' : 'Complete'}
+                                        </button>
+                                    )}
                                 </div>
-
-                                <ChevronRight size={14} className="text-slate-300 shrink-0 ml-1" />
                             </div>
                         );
                     })}
+                    {tasks.length === 0 && (
+                        <div className="p-8 text-center bg-white border border-slate-100 rounded-2xl mx-4 mt-2">
+                             <p className="text-slate-400 font-bold text-sm">No tasks available right now.</p>
+                             <p className="text-slate-300 font-medium text-xs mt-1">Please check back later.</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* ── Footer Banner ── */}

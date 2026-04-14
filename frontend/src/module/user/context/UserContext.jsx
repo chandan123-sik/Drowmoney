@@ -9,8 +9,17 @@ export const UserProvider = ({ children }) => {
         if (saved) return JSON.parse(saved);
         return MOCK_USER;
     });
-    const [notifications, setNotifications] = useState(NOTIFICATIONS);
+    const [notifications, setNotifications] = useState(() => {
+        const saved = localStorage.getItem('dromoney_user_notifications');
+        if (saved) return JSON.parse(saved);
+        return NOTIFICATIONS;
+    });
     const [joinedEvents, setJoinedEvents] = useState([]);
+
+    // Persist notifications
+    React.useEffect(() => {
+        localStorage.setItem('dromoney_user_notifications', JSON.stringify(notifications));
+    }, [notifications]);
 
     // Persist userData on every change
     React.useEffect(() => {
@@ -25,23 +34,40 @@ export const UserProvider = ({ children }) => {
         addNotification("Platform Unlocked!", "You have successfully unlocked full access. Start earning!", "success");
     };
 
-    // 2. Add Coins (including booster logic)
+    // 2. Add Coins (including booster logic and wallet deposit)
     const addCoins = (baseAmount, source) => {
         const factor = userData.isBoosterActive ? 3 : 1;
-        const totalAwarded = baseAmount * factor;
+        const totalAwardedCoins = baseAmount * factor;
+        
+        // Dynamic Conversion logic: assuming 1 Coin = ₹0.1 (can be adjusted by Admin)
+        const coinToRupeeConversion = 0.1; 
+        const earningsInRupee = parseFloat((totalAwardedCoins * coinToRupeeConversion).toFixed(2));
 
         setUserData(prev => ({
             ...prev,
+            earnings: {
+                ...prev.earnings,
+                total: prev.earnings.total + earningsInRupee,
+                today: prev.earnings.today + earningsInRupee
+            },
+            wallet: {
+                ...prev.wallet,
+                balance: prev.wallet.balance + earningsInRupee,
+                transactions: [
+                    { id: Date.now() + 1, type: 'credit', amount: earningsInRupee, title: `Task: ${source}`, status: 'Success', date: new Date().toLocaleDateString() },
+                    ...prev.wallet.transactions
+                ]
+            },
             coins: {
                 ...prev.coins,
-                total: prev.coins.total + totalAwarded,
+                total: prev.coins.total + totalAwardedCoins,
                 history: [
-                    { id: Date.now(), type: 'credit', amount: totalAwarded, source, date: new Date().toLocaleDateString() },
+                    { id: Date.now(), type: 'credit', amount: totalAwardedCoins, source, date: new Date().toLocaleDateString() },
                     ...prev.coins.history
                 ]
             }
         }));
-        addNotification("Coins Added!", `+${totalAwarded} coins earned from ${source}.`, "info");
+        addNotification("Coins Added!", `+${totalAwardedCoins} coins earned from ${source}.`, "info");
     };
 
     // 3. Deduct Coins (Event Entry etc.)

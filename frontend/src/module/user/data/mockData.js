@@ -2,7 +2,7 @@ export const MOCK_USER = {
   name: "Rahul Sharma",
   id: "AFF-10903",
   mobile: "+91 98765 43210",
-  isPaid: false, // Default is locked for new simulation experience
+  isPaid: true, // Auto unlocked for testing tasks
   isBoosterActive: false,
   boosterDaysLeft: 0,
   earnings: {

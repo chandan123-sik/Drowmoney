@@ -1,0 +1,224 @@
+import React, { useState } from 'react';
+import { Users, IndianRupee, Share2, TrendingUp, Edit2, Search, ArrowRight, Award, Filter, Calendar, ExternalLink, ChevronRight, Zap, XCircle, ShieldCheck, CheckCircle2, MoreHorizontal, Link2, UserCheck } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
+import AdminStatCard from '../components/AdminStatCard';
+import StatusBadge from '../components/StatusBadge';
+
+const Affiliates = () => {
+    // ── Data & States ──
+    const [referralsData, setReferralsData] = useState([
+        { id: 1, referrer: 'Ravi Patel', referredTo: 'Rahul Sharma', date: '10 Apr 2026', reward: '₹200', status: 'Credited', txnId: 'PAY-90882', joinTime: '10:30 AM', ip: '192.168.1.45' },
+        { id: 2, referrer: 'Ravi Patel', referredTo: 'Priya Singh', date: '09 Apr 2026', reward: '₹200', status: 'Credited', txnId: 'PAY-66551', joinTime: '02:15 PM', ip: '172.16.0.22' },
+        { id: 3, referrer: 'Rahul Sharma', referredTo: 'Amit Kumar', date: '08 Apr 2026', reward: '₹200', status: 'Credited', txnId: 'PAY-11223', joinTime: '11:00 AM', ip: '10.0.0.12' },
+        { id: 4, referrer: 'Priya Singh', referredTo: 'Neha Verma', date: '08 Apr 2026', reward: '₹200', status: 'Pending', txnId: 'WAITING...', joinTime: '09:45 AM', ip: '142.250.190.46' },
+        { id: 5, referrer: 'Sunita Mehta', referredTo: 'Karan Joshi', date: '07 Apr 2026', reward: '₹200', status: 'Credited', txnId: 'PAY-88770', joinTime: '04:20 PM', ip: '1.1.1.1' },
+    ]);
+
+    const [rate, setRate] = useState(200);
+    const [editing, setEditing] = useState(false);
+    const [tempRate, setTempRate] = useState(200);
+    const [search, setSearch] = useState('');
+    const [filter, setFilter] = useState('All');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5);
+    const [selectedAudit, setSelectedAudit] = useState(null);
+    const [isAuditOpen, setIsAuditOpen] = useState(false);
+
+    // ── Logic ──
+    const handleSearch = (e) => {
+        setSearch(e.target.value);
+        setCurrentPage(1);
+    };
+
+    const filtered = referralsData.filter(r => {
+        const matchesSearch = r.referrer.toLowerCase().includes(search.toLowerCase()) || r.referredTo.toLowerCase().includes(search.toLowerCase());
+        const matchesStatus = filter === 'All' || r.status === filter;
+        return matchesSearch && matchesStatus;
+    });
+
+    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
+
+    const openAudit = (data) => {
+        setSelectedAudit(data);
+        setIsAuditOpen(true);
+    };
+
+    return (
+        <div className="p-6 animate-in fade-in duration-500">
+            <PageHeader title="Affiliate Management" subtitle="Monitor referral network and adjust commission rates" />
+
+            {/* Stat Cards */}
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+                <AdminStatCard label="Total Referrals" value="124" change="+12 this week" icon={Users} color="bg-indigo-600" />
+                <AdminStatCard label="Reward Payouts" value="₹24,800" change="Verified successful joinings" icon={IndianRupee} color="bg-emerald-500" />
+                <AdminStatCard label="Active Referrers" value="32" change="Top: Ravi Patel" icon={Award} color="bg-amber-500" />
+                <AdminStatCard label="Live Commission" value={`₹${rate}`} change="Configurable" icon={Zap} color="bg-sky-500" />
+            </div>
+
+            {/* Toolbar with Edit Rate */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                    <div className="p-3 bg-sky-50 rounded-2xl text-sky-600 shadow-inner"><Share2 size={24} /></div>
+                    <div>
+                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Registration Reward</h3>
+                        {editing ? (
+                            <div className="flex items-center gap-2 mt-1">
+                                <span className="font-black text-slate-600">₹</span>
+                                <input
+                                    type="number"
+                                    value={tempRate}
+                                    onChange={(e) => setTempRate(e.target.value)}
+                                    className="w-20 bg-slate-50 border border-sky-200 rounded-lg px-2 py-1 text-lg font-black text-slate-900 outline-none focus:ring-2 focus:ring-sky-500"
+                                />
+                                <button onClick={() => { setRate(tempRate); setEditing(false); }} className="bg-sky-500 text-white px-3 py-1.5 rounded-lg font-black text-[10px] uppercase">Save</button>
+                                <button onClick={() => setEditing(false)} className="text-slate-400 text-[10px] font-black uppercase px-1">X</button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-3">
+                                <p className="text-2xl font-black text-slate-900 leading-none">₹{rate}</p>
+                                <button onClick={() => { setTempRate(rate); setEditing(true); }} className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg transition-all" title="Click to change commission">
+                                    <Edit2 size={12} />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-4 flex-1 max-w-2xl">
+                    <div className="relative flex-1 w-full">
+                        <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input type="text" value={search} onChange={handleSearch} placeholder="Search referrers..." className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-4 py-3.5 text-[12px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-sky-500 transition-all shadow-inner" />
+                    </div>
+                    <div className="flex gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100 shadow-inner">
+                        {['All', 'Credited', 'Pending'].map(t => (
+                            <button key={t} onClick={() => { setFilter(t); setCurrentPage(1); }} className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === t ? 'bg-[#0F172A] text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}>{t}</button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Simple Table */}
+            <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden mb-6">
+                <div className="overflow-x-auto scrollbar-hide">
+                    <table className="w-full text-sm">
+                        <thead>
+                            <tr className="bg-slate-50/50 border-b border-slate-100">
+                                <th className="text-left px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Referrer</th>
+                                <th className="text-left px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">New Joiner</th>
+                                <th className="text-left px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Reward</th>
+                                <th className="text-left px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Status</th>
+                                <th className="text-center px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Audit</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                            {currentItems.length > 0 ? currentItems.map((r) => (
+                                <tr key={r.id} className="hover:bg-slate-50/40 transition-colors group">
+                                    <td className="px-8 py-5">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-9 h-9 bg-slate-900 rounded-xl flex items-center justify-center text-sky-400 font-black text-[11px] shadow-sm">{r.referrer.charAt(0)}</div>
+                                            <span className="font-black text-slate-800 text-[13px] tracking-tight">{r.referrer}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-5"><span className="font-black text-indigo-600 text-[13px] tracking-tight">{r.referredTo}</span></td>
+                                    <td className="px-8 py-5 font-black text-emerald-600 text-[14px]">₹200</td>
+                                    <td className="px-8 py-5"><StatusBadge status={r.status} /></td>
+                                    <td className="px-8 py-5">
+                                        <div className="flex justify-center">
+                                            <button onClick={() => openAudit(r)} className="w-10 h-10 bg-slate-50 hover:bg-[#0F172A] hover:text-white text-slate-400 rounded-2xl flex items-center justify-center transition-all shadow-sm border border-slate-100"><ShieldCheck size={18} /></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )) : (
+                                <tr><td colSpan="5" className="py-24 text-center"><p className="text-[11px] font-black uppercase tracking-widest text-slate-400">No records found</p></td></tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Standardized Pagination Footer */}
+                <div className="px-8 py-5 bg-slate-50/50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest order-2 sm:order-1 outline-none">
+                        Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filtered.length)} of {filtered.length} entries
+                    </div>
+                    <div className="flex items-center gap-2 order-1 sm:order-2">
+                        <button
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(prev => prev - 1)}
+                            className="px-4 py-2 bg-white border border-slate-100 rounded-xl text-[10px] font-black uppercase text-slate-500 hover:bg-slate-100 disabled:opacity-30 transition-all shadow-sm"
+                        >
+                            Prev
+                        </button>
+                        <div className="flex gap-2">
+                            {[...Array(totalPages)].map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setCurrentPage(i + 1)}
+                                    className={`w-9 h-9 rounded-xl text-[10px] font-black flex items-center justify-center transition-all ${currentPage === i + 1 ? 'bg-[#0F172A] text-white shadow-lg' : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-50'}`}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+                        </div>
+                        <button
+                            disabled={currentPage === totalPages || totalPages === 0}
+                            onClick={() => setCurrentPage(prev => prev + 1)}
+                            className="px-4 py-2 bg-white border border-slate-100 rounded-xl text-[10px] font-black uppercase text-slate-500 hover:bg-slate-100 disabled:opacity-30 transition-all shadow-sm"
+                        >
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* ── SIMPLE AUDIT MODAL ── */}
+            {isAuditOpen && selectedAudit && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+                    <div onClick={() => setIsAuditOpen(false)} className="absolute inset-0 bg-[#0F172A]/80 backdrop-blur-sm"></div>
+                    <div className="relative bg-white w-full max-w-[420px] rounded-[40px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
+                        <div className="bg-[#0F172A] p-7 text-white flex justify-between items-center">
+                            <div>
+                                <h3 className="text-xl font-black tracking-tight">Referral Audit</h3>
+                                <p className="text-[10px] text-sky-400 font-black uppercase tracking-[0.2em] mt-1">Audit ID: #990{selectedAudit.id}</p>
+                            </div>
+                            <button onClick={() => setIsAuditOpen(false)} className="text-white/40 hover:text-white transition-colors"><XCircle size={28} /></button>
+                        </div>
+
+                        <div className="p-8 space-y-8">
+                            {/* Simplified Timeline */}
+                            <div className="space-y-6 relative border-l-2 border-slate-100 ml-4 pl-8">
+                                <div className="relative">
+                                    <div className="absolute -left-[50px] top-0 w-[42px] h-[42px] bg-slate-900 rounded-2xl flex items-center justify-center text-sky-400 text-[14px] font-black shadow-lg">1</div>
+                                    <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Registration</p>
+                                    <p className="text-[14px] font-black text-slate-800">{selectedAudit.date} at {selectedAudit.joinTime}</p>
+                                    <p className="text-[10px] font-bold text-slate-400 mt-1 italic">IP Address: {selectedAudit.ip}</p>
+                                </div>
+
+                                <div className="relative">
+                                    <div className="absolute -left-[50px] top-0 w-[42px] h-[42px] bg-sky-500 rounded-2xl flex items-center justify-center text-white text-[14px] font-black shadow-lg">2</div>
+                                    <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Platform Fee Paid</p>
+                                    <p className="text-[14px] font-black text-slate-800 flex items-center gap-2">
+                                        ₹499.00 <span className="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-md">VERIFIED</span>
+                                    </p>
+                                    <p className="text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">Txn: {selectedAudit.txnId}</p>
+                                </div>
+
+                                <div className="relative">
+                                    <div className="absolute -left-[50px] top-0 w-[42px] h-[42px] bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-[14px] font-black shadow-lg">3</div>
+                                    <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">Commission Credit</p>
+                                    <p className="text-[16px] font-black text-emerald-600">₹200.00 <span className="text-[10px] text-slate-400 font-bold ml-1">Paid to {selectedAudit.referrer}</span></p>
+                                </div>
+                            </div>
+
+                            <button onClick={() => setIsAuditOpen(false)} className="w-full bg-[#0F172A] text-white py-4 rounded-[22px] font-black text-[12px] uppercase tracking-widest shadow-xl shadow-slate-200 active:scale-95 transition-all">Close Report</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default Affiliates;

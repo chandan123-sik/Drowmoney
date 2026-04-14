@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Home, TrendingUp, Wallet, User, Bell, X, CheckCircle2, AlertCircle, Info, Rocket, Menu, Globe, Sparkles, Headset, Building2, HelpCircle, ChevronDown, ChevronRight } from 'lucide-react';
+import { Menu, Bell, Wallet as WalletIcon, Home as HomeIcon, LayoutGrid, User, History, PhoneCall, HelpCircle, Building2, Rocket, MonitorPlay, X, CheckCircle2, AlertCircle, Info, Globe, Sparkles, Headset, ChevronDown } from 'lucide-react';
 import { useUser } from './context/UserContext';
 
 const UserLayout = () => {
@@ -12,10 +12,11 @@ const UserLayout = () => {
     const { userData, notifications, clearNotifications } = useUser();
 
     const navItems = [
-        { path: '/user/home', label: 'Home', icon: Home },
-        { path: '/user/income', label: 'Income', icon: TrendingUp },
-        { path: '/user/wallet', label: 'Wallet', icon: Wallet },
+        { path: '/user/home', label: 'Home', icon: HomeIcon },
+        { path: '/user/earn', label: 'Earn', icon: LayoutGrid },
+        { path: '/user/wallet', label: 'Wallet', icon: WalletIcon },
         { path: '/user/profile', label: 'Profile', icon: User },
+        { path: '/user/watch', label: 'Watch', icon: MonitorPlay },
     ];
 
     const getNotifIcon = (type) => {
@@ -197,7 +198,16 @@ const UserLayout = () => {
                                 <p className="text-[11px] font-black text-slate-800 uppercase tracking-tight">Support</p>
                             </button>
 
-                            {/* Option 5: About */}
+                            {/* Option 5: Promote Your Brand */}
+                            <button 
+                                onClick={() => { navigate('/user/promote-brand'); setIsMenuOpen(false); }}
+                                className="w-full px-5 py-4 flex items-center gap-3 hover:bg-slate-50 transition-colors border-b border-slate-50 text-left"
+                            >
+                                <Rocket size={18} className="text-sky-500" />
+                                <p className="text-[11px] font-black text-slate-800 uppercase tracking-tight">Promote Your Brand</p>
+                            </button>
+
+                            {/* Option 6: About */}
                             <button 
                                 onClick={() => { navigate('/user/info/about'); setIsMenuOpen(false); }}
                                 className="w-full px-5 py-4 flex items-center gap-3 hover:bg-slate-50 transition-colors text-left"

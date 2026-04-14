@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import { TASKS } from '../data/mockData';
+import { taskStorage } from '../../shared/services/taskStorage';
 import { ChevronLeft, CheckCircle2, Play, UploadCloud, Link as LinkIcon, Loader2, Image as ImageIcon } from 'lucide-react';
 
 const TaskRunner = () => {
@@ -16,20 +16,25 @@ const TaskRunner = () => {
         }
     }, [userData.isPaid, navigate]);
 
-    const task = TASKS.find(t => t.id === parseInt(id));
-    
+    // Fetch dynamic task from storage once inside an effect
+    const [task, setTask] = useState(null);
     const [timeLeft, setTimeLeft] = useState(0);
     const [status, setStatus] = useState('idle'); // idle, running, verify, completed
     const [screenshotFile, setScreenshotFile] = useState(null);
 
     useEffect(() => {
-        if (!task) return;
-        if (task.type === 'Video') {
-            setTimeLeft(30);
-        } else if (task.type === 'Web') {
-            setTimeLeft(15);
+        const allTasks = taskStorage.getTasks();
+        const foundTask = allTasks.find(t => String(t.id) === String(id));
+        setTask(foundTask);
+        
+        if (foundTask) {
+             const tType = foundTask.type;
+             const timerValue = Number(foundTask.config?.timer) || (tType === 'Video' ? 30 : 15);
+             if (tType === 'Video' || tType === 'Web') {
+                 setTimeLeft(timerValue);
+             }
         }
-    }, [task]);
+    }, [id]);
 
     useEffect(() => {
         if (status === 'running' && timeLeft > 0) {
@@ -40,15 +45,22 @@ const TaskRunner = () => {
         }
     }, [status, timeLeft]);
 
-    if (!task) return <div className="p-8 text-center text-white min-h-screen bg-slate-950">System error: Task not found!</div>;
+    if (!task) return <div className="p-8 text-center text-white min-h-screen bg-slate-950 flex items-center justify-center font-bold uppercase tracking-widest"><Loader2 className="animate-spin mr-2" /> Loading Task...</div>;
 
     const startTask = () => {
         setStatus('running');
+        
+        // Open the external URL if it exists
+        if ((task.type === 'Web' || task.type === 'Video') && task.config?.url) {
+            window.open(task.config.url, '_blank', 'noopener,noreferrer');
+        }
     };
 
     const submitTask = () => {
         setStatus('completed');
         addCoins(task.reward, task.title);
+        // Persist completion state
+        taskStorage.markComplete(task.id);
         setTimeout(() => navigate('/user/earn'), 2000);
     };
 
@@ -62,6 +74,7 @@ const TaskRunner = () => {
                 <div className="flex-1 truncate">
                     <h1 className="text-base font-black text-white truncate">{task.title}</h1>
                     <p className="text-[9px] text-sky-400 font-bold uppercase tracking-widest leading-none mt-1">Live Task Mode</p>
+
                 </div>
                 <div className="bg-amber-500/10 px-3 py-1.5 rounded-full border border-amber-500/20 shadow-inner shrink-0">
                     <span className="font-black text-amber-400 text-xs">+{task.reward} Coin</span>
@@ -178,19 +191,19 @@ const TaskRunner = () => {
                     </div>
                 )}
 
-                {/* SOCIAL TASK */}
-                {task.type === 'Social' && (
+                {/* PROOF TASK (Formerly Social) */}
+                {task.type === 'Proof' && (
                     <div className="flex-1 flex flex-col gap-5 justify-center">
                        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-lg relative overflow-hidden">
                             {/* Decorative blur blob */}
                             <div className="absolute -top-10 -right-10 w-32 h-32 bg-pink-500/20 rounded-full blur-[40px] pointer-events-none"></div>
 
                             <div className="w-20 h-20 bg-gradient-to-tr from-amber-400 via-rose-500 to-fuchsia-600 rounded-[1.5rem] mx-auto flex items-center justify-center mb-5 shadow-xl shadow-rose-500/20">
-                               <span className="text-white text-3xl font-black italic">IG</span>
+                               <Camera size={32} className="text-white" />
                             </div>
-                            <h2 className="text-white font-black text-xl mb-2 tracking-tight">Follow Junkar App</h2>
+                            <h2 className="text-white font-black text-xl mb-2 tracking-tight">Proof Required</h2>
                             <p className="text-[11px] text-slate-400 font-bold mb-8 px-4 leading-relaxed tracking-wide">
-                                Step 1: Open Instagram and hit Follow. Take a screenshot for proof.
+                                {task.config?.instructions || "Complete the task manually and upload proof."}
                             </p>
                             
                             <button className="w-full bg-slate-950 border border-slate-800 text-white hover:text-sky-400 hover:border-sky-500/50 font-black uppercase tracking-widest py-4 rounded-xl hover:bg-slate-900 transition-all text-xs flex justify-center items-center gap-2" onClick={() => setStatus('verify')}>
@@ -230,13 +243,25 @@ const TaskRunner = () => {
                        )}
                     </div>
                 )}
+                {/* QUIZ AND SPIN MOCKS */}
+                {(task.type === 'Quiz' || task.type === 'Spin') && (
+                     <div className="flex-1 flex items-center justify-center">
+                         <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl text-center shadow-2xl">
+                              <h2 className="text-white font-black text-xl mb-2">{task.title} Simulation</h2>
+                              <p className="text-xs text-slate-400 mb-6">{task.description}</p>
+                              <button onClick={() => setStatus('verify')} className="bg-amber-500 text-slate-950 px-6 py-3 rounded-full font-black text-xs uppercase tracking-widest hover:bg-amber-400 active:scale-95 transition-transform shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+                                  {task.type === 'Quiz' ? 'Simulate Quiz Win' : 'Simulate Spin Win'}
+                              </button>
+                         </div>
+                     </div>
+                )}
             </div>
 
             {/* Bottom Action Footer fixed to bottom of this specific page */}
              <div className="p-4 bg-slate-950 border-t border-slate-800 shrink-0">
                 <button 
                     onClick={submitTask}
-                    disabled={status !== 'verify' || (task.type === 'Social' && !screenshotFile) || status === 'completed'}
+                    disabled={status !== 'verify' || (task.type === 'Proof' && !screenshotFile) || status === 'completed'}
                     className="w-full bg-sky-500 hover:bg-sky-400 active:scale-[0.98] disabled:opacity-50 disabled:bg-slate-900 disabled:text-slate-600 text-slate-950 font-black uppercase tracking-[0.2em] py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(14,165,233,0.2)] disabled:shadow-none flex justify-center items-center gap-2 text-[11px]"
                 >
                     {status === 'completed' && <Loader2 className="animate-spin" size={16} />}

@@ -91,16 +91,16 @@ const HelpCenter = () => {
                     
                     <div className="space-y-3 pt-2">
                         {GUIDES.map((guide, i) => (
-                            <div key={i} className="border-b border-slate-50 last:border-0 pb-3 last:pb-0">
+                            <div key={i} className={`rounded-2xl transition-all duration-300 ${activeGuide === i ? 'bg-slate-50/80 p-3 -mx-3' : 'border-b border-slate-50 last:border-0 pb-3 last:pb-0'}`}>
                                 <button 
                                     onClick={() => setActiveGuide(activeGuide === i ? null : i)}
-                                    className="w-full flex items-center justify-between text-left group"
+                                    className="w-full flex items-center justify-between text-left group py-1"
                                 >
-                                    <span className={`text-[11px] font-black transition-colors ${activeGuide === i ? 'text-sky-500' : 'text-slate-600'}`}>{guide.q}</span>
+                                    <span className={`text-[12px] font-black transition-colors ${activeGuide === i ? 'text-sky-500' : 'text-slate-600'}`}>{guide.q}</span>
                                     <ChevronDown size={14} className={`text-slate-300 transition-transform duration-300 ${activeGuide === i ? 'rotate-180 text-sky-500' : ''}`} />
                                 </button>
-                                <div className={`overflow-hidden transition-all duration-300 ${activeGuide === i ? 'max-h-20 mt-2' : 'max-h-0'}`}>
-                                    <p className="text-[10px] font-bold text-slate-400 leading-relaxed pl-1">{guide.a}</p>
+                                <div className={`overflow-hidden transition-all duration-500 ease-in-out ${activeGuide === i ? 'max-h-60 mt-2 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                    <p className="text-[11px] font-bold text-slate-400 leading-relaxed pl-1 pb-1">{guide.a}</p>
                                 </div>
                             </div>
                         ))}
