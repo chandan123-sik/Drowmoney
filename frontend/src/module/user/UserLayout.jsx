@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, Bell, Wallet as WalletIcon, Home as HomeIcon, LayoutGrid, User, History, PhoneCall, HelpCircle, Building2, Rocket, MonitorPlay, X, CheckCircle2, AlertCircle, Info, Globe, Sparkles, Headset, ChevronDown } from 'lucide-react';
+import { Menu, Bell, Wallet as WalletIcon, Home as HomeIcon, LayoutGrid, User, History, PhoneCall, HelpCircle, Building2, Rocket, MonitorPlay, X, CheckCircle2, AlertCircle, Info, Globe, Sparkles, Headset, ChevronDown, TrendingUp } from 'lucide-react';
 import { useUser } from './context/UserContext';
 
 const UserLayout = () => {
@@ -13,7 +13,7 @@ const UserLayout = () => {
 
     const navItems = [
         { path: '/user/home', label: 'Home', icon: HomeIcon },
-        { path: '/user/earn', label: 'Earn', icon: LayoutGrid },
+        { path: '/user/income', label: 'Income', icon: TrendingUp },
         { path: '/user/wallet', label: 'Wallet', icon: WalletIcon },
         { path: '/user/profile', label: 'Profile', icon: User },
         { path: '/user/watch', label: 'Watch', icon: MonitorPlay },
