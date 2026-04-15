@@ -15,8 +15,8 @@ const UserLayout = () => {
         { path: '/user/home', label: 'Home', icon: HomeIcon },
         { path: '/user/income', label: 'Income', icon: TrendingUp },
         { path: '/user/wallet', label: 'Wallet', icon: WalletIcon },
+        { path: '/user/watch', label: 'Watch and Earn', icon: MonitorPlay },
         { path: '/user/profile', label: 'Profile', icon: User },
-        { path: '/user/watch', label: 'Watch', icon: MonitorPlay },
     ];
 
     const getNotifIcon = (type) => {
