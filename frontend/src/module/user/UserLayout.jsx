@@ -29,7 +29,7 @@ const UserLayout = () => {
     };
 
     return (
-        <div className="min-h-screen bg-sky-50 pt-16 text-sky-900 font-sans overflow-x-hidden">
+        <div className="min-h-screen bg-sky-50 text-sky-900 font-sans overflow-x-hidden">
             {/* --- New Dromoney Fixed Top Header --- */}
             <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-sky-100 px-4 py-2.5 flex items-center justify-between shadow-sm max-w-md mx-auto">
                 {/* Left Side: Logo & Brand */}
@@ -225,7 +225,7 @@ const UserLayout = () => {
             </div>
 
             {/* --- Dynamic Content Rendering Area (Pages) --- */}
-            <main className="max-w-md mx-auto pb-16">
+            <main className="max-w-md mx-auto pt-[57px] pb-16">
                 <Outlet />
             </main>
 

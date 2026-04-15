@@ -22,6 +22,10 @@ import FutureFund from './module/user/pages/FutureFund';
 import PromoteBrand from './module/user/pages/PromoteBrand';
 import WatchAndEarn from './module/user/pages/WatchAndEarn';
 import AdPlayer from './module/user/pages/AdPlayer';
+import QuizView from './module/user/pages/QuizView';
+import LuckyDrawView from './module/user/pages/LuckyDrawView';
+import GoldPredictionView from './module/user/pages/GoldPredictionView';
+import TaskRaceView from './module/user/pages/TaskRaceView';
 
 // Auth Pages
 import AuthLayout from './module/user/auth/AuthLayout';
@@ -93,6 +97,10 @@ function App() {
             <Route path="/user/task/:id" element={<TaskRunner />} />
             <Route path="/user/promote-brand" element={<PromoteBrand />} />
             <Route path="/user/ad-player/:id" element={<AdPlayer />} />
+            <Route path="/user/quiz/:id" element={<QuizView />} />
+            <Route path="/user/lucky-draw/:id" element={<LuckyDrawView />} />
+            <Route path="/user/gold-prediction/:id" element={<GoldPredictionView />} />
+            <Route path="/user/task-race/:id" element={<TaskRaceView />} />
             <Route path="/user/contest/:id" element={<ContestView />} />
 
             {/* Admin Module Routes */}

@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Sparkles, Zap, Rocket, Plus, Trash2, 
     Save, Layout, Palette, Type, 
     ChevronRight, ChevronLeft, Info, CheckCircle2,
-    Trophy, Users, Target, MousePointer2, List
+    Trophy, Users, Target, MousePointer2, List, FileText
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
+import { contentStorage } from '../../shared/services/contentStorage';
 
 const MarketingManager = () => {
     const [activeTab, setActiveTab] = useState('banners');
+
+    // ── Info Pages Data (Dynamic CMS) ──
+    const [infoPages, setInfoPages] = useState({});
+    const [selectedPage, setSelectedPage] = useState('how-it-works');
+
+    useEffect(() => {
+        setInfoPages(contentStorage.getPages());
+    }, []);
 
     // ── Banners Data ──
     const [banners, setBanners] = useState([
@@ -56,6 +65,7 @@ const MarketingManager = () => {
             {/* Sub-navigation Tabs */}
             <div className="flex gap-2 mb-10 mt-6 bg-white p-2 rounded-[28px] border border-slate-100 shadow-sm w-fit">
                 {[
+                    { id: 'menu', label: 'Menu Pages', icon: FileText },
                     { id: 'banners', label: 'Ad Banners', icon: Layout },
                     { id: 'boosters', label: 'Booster Packs', icon: Zap },
                     { id: 'lifetime', label: 'Lifetime Promo', icon: Rocket },
@@ -73,6 +83,108 @@ const MarketingManager = () => {
 
             <div className="animate-in slide-in-from-bottom-4 duration-500 pb-20">
                 
+                {/* ── NEW: INFO PAGES CMS ── */}
+                {activeTab === 'menu' && infoPages && infoPages[selectedPage] && (
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
+                        {/* Editor Side */}
+                        <div className="space-y-6">
+                            <div className="flex flex-wrap gap-2 mb-4">
+                                {Object.keys(infoPages).map(key => (
+                                    <button 
+                                        key={key}
+                                        onClick={() => setSelectedPage(key)}
+                                        className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${selectedPage === key ? 'bg-sky-500 text-white shadow-lg shadow-sky-200' : 'bg-white text-slate-500 border border-slate-100 hover:bg-slate-50'}`}
+                                    >
+                                        {key.replace('-', ' ')}
+                                    </button>
+                                ))}
+                            </div>
+                            
+                            <div className="bg-white rounded-[44px] border border-slate-100 shadow-sm p-8">
+                                <div className="flex items-center justify-between mb-8 border-b border-slate-50 pb-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-sky-50 text-sky-500 rounded-2xl flex items-center justify-center"><FileText size={24} /></div>
+                                        <div>
+                                            <h3 className="text-lg font-black text-slate-800 tracking-tight uppercase">Menu Content Editor</h3>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Editing: {selectedPage.replace('-', ' ')}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Page Title</label>
+                                        <input value={infoPages[selectedPage].title} onChange={(e) => {
+                                            const np = {...infoPages}; np[selectedPage].title = e.target.value; setInfoPages(np);
+                                        }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-bold text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Page Subtitle</label>
+                                        <input value={infoPages[selectedPage].subtitle} onChange={(e) => {
+                                            const np = {...infoPages}; np[selectedPage].subtitle = e.target.value; setInfoPages(np);
+                                        }} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[13px] font-bold text-slate-500 focus:ring-2 focus:ring-sky-500 outline-none" />
+                                    </div>
+
+                                    <div className="space-y-4 pt-4 border-t border-slate-50">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Content Sections (Bullets)</label>
+                                        {infoPages[selectedPage].sections?.map((section, i) => (
+                                            <div key={i} className="bg-slate-50 rounded-3xl p-5 border border-slate-100 relative group">
+                                                <button onClick={() => {
+                                                    const np = {...infoPages}; np[selectedPage].sections.splice(i, 1); setInfoPages(np);
+                                                }} className="absolute top-4 right-4 text-rose-400 hover:text-rose-600"><Trash2 size={16} /></button>
+                                                <input value={section.title} onChange={(e) => {
+                                                    const np = {...infoPages}; np[selectedPage].sections[i].title = e.target.value; setInfoPages(np);
+                                                }} className="w-[85%] bg-white border-b border-slate-100 px-3 py-2 text-[13px] font-black text-slate-700 outline-none mb-2 rounded-t-xl" placeholder="Section Title" />
+                                                <textarea value={section.text} onChange={(e) => {
+                                                    const np = {...infoPages}; np[selectedPage].sections[i].text = e.target.value; setInfoPages(np);
+                                                }} className="w-full bg-white px-3 py-2 text-[12px] font-bold text-slate-500 h-16 outline-none resize-none rounded-b-xl" placeholder="Section Description..." />
+                                            </div>
+                                        ))}
+                                        <button onClick={() => {
+                                            const np = {...infoPages};
+                                            if(!np[selectedPage].sections) np[selectedPage].sections = [];
+                                            np[selectedPage].sections.push({title: 'New Section', text: 'Enter details...'});
+                                            setInfoPages(np);
+                                        }} className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-sky-500 hover:border-sky-300 transition-all">+ Add Section</button>
+                                    </div>
+                                    <button onClick={() => {
+                                        contentStorage.updatePage(selectedPage, infoPages[selectedPage]);
+                                        alert('Saved successfully!');
+                                    }} className="w-full mt-6 bg-[#0F172A] text-white py-4 rounded-2xl font-black text-[12px] uppercase tracking-widest shadow-xl flex items-center justify-center gap-2">
+                                        <Save size={16} /> Update Page Content
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Preview Side */}
+                        <div className="space-y-4">
+                            <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-4 flex items-center gap-2 italic">Live App Preview <ChevronRight size={12} /></h4>
+                            <div className="bg-slate-100 rounded-[50px] p-6 border-8 border-slate-200 shadow-2xl relative h-[700px] overflow-hidden flex flex-col scale-95 origin-top">
+                                <div className="absolute top-4 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-3xl z-50"></div>
+                                {/* Emulated Mobile App View */}
+                                <div className="flex-1 bg-white rounded-[32px] overflow-hidden flex flex-col relative">
+                                    <div className="p-6 bg-slate-900 text-white">
+                                        <h1 className="text-2xl font-black tracking-tight mt-6">{infoPages[selectedPage].title}</h1>
+                                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">{infoPages[selectedPage].subtitle}</p>
+                                    </div>
+                                    <div className="flex-1 bg-white p-6 overflow-y-auto space-y-6 rounded-t-3xl -mt-4 relative z-10 custom-scrollbar">
+                                        {infoPages[selectedPage].sections?.map((section, idx) => (
+                                            <div key={idx} className="flex gap-4">
+                                                <div className="mt-1"><CheckCircle2 size={20} className="text-sky-500" /></div>
+                                                <div>
+                                                    <h3 className="text-sm font-black text-slate-800 mb-1">{section.title}</h3>
+                                                    <p className="text-xs font-bold text-slate-500 leading-relaxed">{section.text}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* ── NEW: FUTURE FEATURES CMS ── */}
                 {activeTab === 'future' && (
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
