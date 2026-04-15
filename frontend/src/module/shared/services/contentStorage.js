@@ -1,4 +1,5 @@
 const INFO_KEY = 'dromoney_info_pages_v2';
+const PROJECTS_KEY = 'dromoney_project_card_v1';
 
 const DEFAULT_CONTENT = {
     'how-it-works': {
@@ -41,6 +42,11 @@ const DEFAULT_CONTENT = {
     }
 };
 
+const DEFAULT_PROJECTS = {
+    title: 'Drowmoney Projects',
+    description: 'Access exclusive high-ticket affiliate projects and scale your monthly income with verified partners.'
+};
+
 export const contentStorage = {
     getPages: () => {
         const saved = localStorage.getItem(INFO_KEY);
@@ -57,5 +63,15 @@ export const contentStorage = {
             localStorage.setItem(INFO_KEY, JSON.stringify(pages));
         }
         return pages;
+    },
+    getProjects: () => {
+        const saved = localStorage.getItem(PROJECTS_KEY);
+        if (saved) return JSON.parse(saved);
+        localStorage.setItem(PROJECTS_KEY, JSON.stringify(DEFAULT_PROJECTS));
+        return DEFAULT_PROJECTS;
+    },
+    updateProjects: (data) => {
+        localStorage.setItem(PROJECTS_KEY, JSON.stringify(data));
+        return data;
     }
 };

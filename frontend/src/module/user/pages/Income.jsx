@@ -7,6 +7,7 @@ import {
     Sparkles, ChevronRight, Lock, Loader2, ShieldCheck, Zap,
     UploadCloud, Fingerprint, Image as ImageIcon, CheckCircle2, Clock
 } from 'lucide-react';
+import { contentStorage } from '../../shared/services/contentStorage';
 
 // ─── 6 Income Cards Config (Modern Fintech Design) ───────────────────────────
 const INCOME_OPTIONS = [
@@ -85,6 +86,11 @@ const Income = () => {
     const [kycPhoto, setKycPhoto] = useState(null);
     const [isPaymentOpen, setIsPaymentOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [projectsData, setProjectsData] = useState({ title: 'Drowmoney Projects', description: '' });
+
+    useEffect(() => {
+        setProjectsData(contentStorage.getProjects());
+    }, []);
 
     const handlePhotoChange = (e) => {
         const file = e.target.files[0];
@@ -374,16 +380,15 @@ const Income = () => {
                 })}
             </div>
 
-            {/* Refined Project Info Card */}
             <div className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm relative overflow-hidden group mb-4">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-sky-500/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
                 <div className="w-10 h-10 bg-sky-50 rounded-xl flex items-center justify-center shrink-0 border border-sky-100">
                     <Briefcase size={20} className="text-sky-500" />
                 </div>
                 <div>
-                    <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest leading-none">Drowmoney Projects</h4>
+                    <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest leading-none">{projectsData.title}</h4>
                     <p className="text-[9px] font-bold text-slate-400 leading-tight mt-1">
-                        Access exclusive high-ticket affiliate projects and scale your monthly income with verified partners.
+                        {projectsData.description}
                     </p>
                 </div>
             </div>

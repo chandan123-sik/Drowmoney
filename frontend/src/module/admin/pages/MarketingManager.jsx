@@ -3,7 +3,7 @@ import {
     Sparkles, Zap, Rocket, Plus, Trash2, 
     Save, Layout, Palette, Type, 
     ChevronRight, ChevronLeft, Info, CheckCircle2,
-    Trophy, Users, Target, MousePointer2, List, FileText
+    Trophy, Users, Target, MousePointer2, List, FileText, Briefcase
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { contentStorage } from '../../shared/services/contentStorage';
@@ -15,9 +15,6 @@ const MarketingManager = () => {
     const [infoPages, setInfoPages] = useState({});
     const [selectedPage, setSelectedPage] = useState('how-it-works');
 
-    useEffect(() => {
-        setInfoPages(contentStorage.getPages());
-    }, []);
 
     // ── Banners Data ──
     const [banners, setBanners] = useState([
@@ -57,6 +54,14 @@ const MarketingManager = () => {
         { title: 'Global Payouts', text: 'Expansion beyond local banking to support international earners through crypto and PayPal.' },
         { title: 'Advanced AI Tools', text: 'Get automated marketing kits generated for your affiliate links for 10x better results.' }
     ]);
+    
+    // -- Projects Card Data --
+    const [projectsData, setProjectsData] = useState({ title: '', description: '' });
+
+    useEffect(() => {
+        setInfoPages(contentStorage.getPages());
+        setProjectsData(contentStorage.getProjects());
+    }, []);
 
     return (
         <div className="p-6 animate-in fade-in duration-700 bg-slate-50/50 min-h-screen">
@@ -69,6 +74,7 @@ const MarketingManager = () => {
                     { id: 'banners', label: 'Ad Banners', icon: Layout },
                     { id: 'boosters', label: 'Booster Packs', icon: Zap },
                     { id: 'lifetime', label: 'Lifetime Promo', icon: Rocket },
+                    { id: 'projects', label: 'Income Projects', icon: Briefcase },
                     { id: 'future', label: 'Future Features', icon: Sparkles },
                 ].map(tab => (
                     <button 
@@ -498,6 +504,67 @@ const MarketingManager = () => {
                                                 </div>
                                             ))}
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* ── NEW: INCOME PROJECTS CARD CMS ── */}
+                {activeTab === 'projects' && (
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
+                        {/* Editor Side */}
+                        <div className="space-y-6">
+                            <div className="bg-white rounded-[44px] border border-slate-100 shadow-sm p-10 space-y-8 relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 opacity-40 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform"></div>
+                                <div className="flex items-center gap-4 relative">
+                                    <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center"><Briefcase size={30} /></div>
+                                    <div>
+                                        <h3 className="text-2xl font-black text-slate-800 tracking-tight">Project Card CMS</h3>
+                                        <p className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mt-1">Manage the "Drowmoney Projects" info card</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-6 pt-4 relative">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Card Title</label>
+                                        <input value={projectsData.title} onChange={(e) => setProjectsData({...projectsData, title: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[15px] font-black text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 transition-all" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Description Text</label>
+                                        <textarea value={projectsData.description} onChange={(e) => setProjectsData({...projectsData, description: e.target.value})} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-[14px] font-bold text-slate-500 h-32 outline-none focus:ring-2 focus:ring-emerald-500 transition-all resize-none shadow-inner" />
+                                    </div>
+                                    
+                                    <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 italic text-[10px] text-emerald-700 font-bold">
+                                        Note: These changes will reflect immediately on the User "Income Center" page.
+                                    </div>
+                                </div>
+
+                                <button onClick={() => {
+                                    contentStorage.updateProjects(projectsData);
+                                    alert('Project data updated successfully!');
+                                }} className="w-full relative mt-4 bg-[#0F172A] text-white py-5 rounded-[24px] font-black text-[12px] uppercase tracking-widest shadow-2xl flex items-center justify-center gap-3 active:scale-95 transition-all">
+                                    <Save size={20} /> Update Project Card
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Preview Side */}
+                        <div className="flex flex-col justify-center">
+                            <div className="bg-slate-50 p-12 rounded-[60px] border border-slate-200 shadow-inner flex flex-col items-center">
+                                <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] mb-10 text-center italic">User Panel Live View</p>
+                                
+                                <div className="w-[320px] bg-white border border-slate-100 rounded-[2rem] p-5 flex items-center gap-4 shadow-xl ring-8 ring-white relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+                                    <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0 border border-emerald-100">
+                                        <Briefcase size={22} className="text-emerald-500" />
+                                    </div>
+                                    <div className="relative">
+                                        <h4 className="text-[12px] font-black text-slate-800 uppercase tracking-widest leading-none">{projectsData.title || 'Drowmoney Projects'}</h4>
+                                        <p className="text-[10px] font-bold text-slate-400 leading-tight mt-1.5 line-clamp-2">
+                                            {projectsData.description || 'Access exclusive high-ticket affiliate projects and scale your monthly income...'}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
