@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Trophy, Plus, Play, Square, CheckCircle, Edit3, Trash2, Save,
     Users, Gift, Zap, ClipboardList, Award, Eye, ChevronDown, ChevronRight,
-    ToggleLeft, ToggleRight, Star, Coins, X, AlertCircle, Check
+    ToggleLeft, ToggleRight, Star, Coins, X, AlertCircle, Check, Sparkles
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { eventStorage } from '../../shared/services/eventStorage';
@@ -167,18 +167,20 @@ const ContentTab = ({ events, onShowToast }) => {
     const [selectedEventId, setSelectedEventId] = useState('quiz-daily');
     const [questions, setQuestions] = useState([]);
     const [prizes, setPrizes] = useState([]);
-    const [tasks, setTasks] = useState([]);
+    const [cards, setCards] = useState([]);
     const [goldReward, setGoldReward] = useState(40);
-    const [taskTimeLimit, setTaskTimeLimit] = useState(60);
+    const [peekTime, setPeekTime] = useState(2.5);
+    const [maxTime, setMaxTime] = useState(60);
 
     useEffect(() => {
         setQuestions(eventStorage.getQuestions());
         setPrizes(eventStorage.getPrizes());
-        setTasks(eventStorage.getTasks());
+        setCards(eventStorage.getCards());
         const gpConf = eventStorage.getEvents().find(e => e.id === 'gold-prediction');
-        const trConf = eventStorage.getEvents().find(e => e.id === 'task-race');
+        const mmConf = eventStorage.getEvents().find(e => e.id === 'memory-master');
         setGoldReward(gpConf?.coinReward || 40);
-        setTaskTimeLimit(trConf?.timeLimit || 60);
+        setPeekTime(mmConf?.peekTime || 2.5);
+        setMaxTime(mmConf?.maxTime || 60);
     }, []);
 
     const sel = events.find(e => e.id === selectedEventId);
@@ -203,14 +205,12 @@ const ContentTab = ({ events, onShowToast }) => {
     const deletePrize = (idx) => setPrizes(prev => prev.filter((_, i) => i !== idx));
     const savePrizes = () => { eventStorage.updatePrizes(prizes); onShowToast('Lucky Draw prizes saved!', 'success'); };
 
-    // ── Task Race ──
-    const addTask = () => setTasks(prev => [...prev, { id: Date.now(), text: 'New Task', points: 10 }]);
-    const updateTask = (idx, field, val) => setTasks(prev => prev.map((t, i) => i === idx ? { ...t, [field]: val } : t));
-    const deleteTask = (idx) => setTasks(prev => prev.filter((_, i) => i !== idx));
-    const saveTasks = () => {
-        eventStorage.updateTasks(tasks);
-        eventStorage.updateEvent('task-race', { timeLimit: +taskTimeLimit });
-        onShowToast('Task Race updated!', 'success');
+    // ── Memory Master ──
+    const updateCard = (idx, field, val) => setCards(prev => prev.map((c, i) => i === idx ? { ...c, [field]: val } : c));
+    const saveMemoryGame = () => {
+        eventStorage.updateCards(cards);
+        eventStorage.updateEvent('memory-master', { peekTime: +peekTime, maxTime: +maxTime });
+        onShowToast('Memory Master updated!', 'success');
     };
 
     // ── Gold ──
@@ -338,38 +338,49 @@ const ContentTab = ({ events, onShowToast }) => {
                 </div>
             )}
 
-            {/* Task Race Content */}
-            {selectedEventId === 'task-race' && (
+            {/* Memory Master Content */}
+            {selectedEventId === 'memory-master' && (
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-[15px] font-black text-slate-800">Tasks ({tasks.length})</h3>
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-[15px] font-black text-slate-800">Card Symbols ({cards.length})</h3>
                         <div className="flex items-center gap-3">
                             <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-                                <span className="text-[10px] font-black text-slate-400 uppercase">Timer (sec)</span>
-                                <input type="number" value={taskTimeLimit} onChange={e => setTaskTimeLimit(e.target.value)} className="w-14 text-sm font-black text-slate-800 outline-none text-center bg-transparent" />
+                                <span className="text-[10px] font-black text-slate-400 uppercase">Peek (s)</span>
+                                <input type="number" step="0.5" value={peekTime} onChange={e => setPeekTime(e.target.value)} className="w-12 text-sm font-black text-slate-800 outline-none text-center bg-transparent" />
                             </div>
-                            <button onClick={addTask} className="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-emerald-100 transition-all">
-                                <Plus size={14} /> Add Task
-                            </button>
-                            <button onClick={saveTasks} className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500 text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-md">
-                                <Save size={14} /> Save All
+                            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                                <span className="text-[10px] font-black text-slate-400 uppercase">Game (s)</span>
+                                <input type="number" value={maxTime} onChange={e => setMaxTime(e.target.value)} className="w-12 text-sm font-black text-slate-800 outline-none text-center bg-transparent" />
+                            </div>
+                            <button onClick={saveMemoryGame} className="flex items-center gap-1.5 px-4 py-2 bg-indigo-500 text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-md">
+                                <Save size={14} /> Save Config
                             </button>
                         </div>
                     </div>
-                    <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
-                        {tasks.map((t, idx) => (
-                            <div key={t.id} className="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-xl p-3">
-                                <span className="w-6 h-6 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-[10px] font-black shrink-0">{idx + 1}</span>
-                                <input value={t.text} onChange={e => updateTask(idx, 'text', e.target.value)} className="flex-1 text-sm font-bold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 outline-none" placeholder="Task description..." />
-                                <div className="flex items-center gap-1 bg-amber-50 border border-amber-100 rounded-lg px-2 py-1.5">
-                                    <Coins size={12} className="text-amber-500" />
-                                    <input type="number" value={t.points} onChange={e => updateTask(idx, 'points', +e.target.value)} className="w-12 text-sm font-bold text-amber-700 outline-none text-center bg-transparent" />
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {cards.map((c, idx) => (
+                            <div key={c.id} className="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                                <div className={`w-12 h-12 bg-white rounded-xl border border-slate-200 flex items-center justify-center ${c.color} shadow-sm`}>
+                                    <Sparkles size={20} />
                                 </div>
-                                <button onClick={() => deleteTask(idx)} className="p-1.5 text-rose-400 hover:bg-rose-50 rounded-lg transition-all">
-                                    <Trash2 size={14} />
-                                </button>
+                                <div className="flex-1 space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[10px] font-bold text-slate-400 w-16">Icon Name:</span>
+                                        <input value={c.icon} onChange={e => updateCard(idx, 'icon', e.target.value)} className="flex-1 text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-lg px-2 py-1 outline-none" />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[10px] font-bold text-slate-400 w-16">Color Class:</span>
+                                        <input value={c.color} onChange={e => updateCard(idx, 'color', e.target.value)} className="flex-1 text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-lg px-2 py-1 outline-none" />
+                                    </div>
+                                </div>
                             </div>
                         ))}
+                    </div>
+
+                    <div className="mt-6 p-4 bg-indigo-50 rounded-2xl border border-indigo-100 flex items-center gap-3">
+                        <AlertCircle size={18} className="text-indigo-500" />
+                        <p className="text-[11px] font-bold text-indigo-700">Memory Master requires 6 pairs. Icons must be valid Lucide icon names.</p>
                     </div>
                 </div>
             )}

@@ -25,7 +25,7 @@ import AdPlayer from './module/user/pages/AdPlayer';
 import QuizView from './module/user/pages/QuizView';
 import LuckyDrawView from './module/user/pages/LuckyDrawView';
 import GoldPredictionView from './module/user/pages/GoldPredictionView';
-import TaskRaceView from './module/user/pages/TaskRaceView';
+import MemoryMasterView from './module/user/pages/MemoryMasterView';
 
 // Auth Pages
 import AuthLayout from './module/user/auth/AuthLayout';
@@ -100,7 +100,7 @@ function App() {
             <Route path="/user/quiz/:id" element={<QuizView />} />
             <Route path="/user/lucky-draw/:id" element={<LuckyDrawView />} />
             <Route path="/user/gold-prediction/:id" element={<GoldPredictionView />} />
-            <Route path="/user/task-race/:id" element={<TaskRaceView />} />
+            <Route path="/user/memory-master/:id" element={<MemoryMasterView />} />
             <Route path="/user/contest/:id" element={<ContestView />} />
 
             {/* Admin Module Routes */}

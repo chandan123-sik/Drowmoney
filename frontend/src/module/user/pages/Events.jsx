@@ -47,7 +47,7 @@ const Events = () => {
             case 'Quiz': navigate(`/user/quiz/${event.id}`); break;
             case 'Draw': navigate(`/user/lucky-draw/${event.id}`); break;
             case 'Prediction': navigate(`/user/gold-prediction/${event.id}`); break;
-            case 'Task': navigate(`/user/task-race/${event.id}`); break;
+            case 'Brain': navigate(`/user/memory-master/${event.id}`); break;
             default: break;
         }
     };

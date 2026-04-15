@@ -4,11 +4,11 @@
 // ─────────────────────────────────────────────
 
 const KEYS = {
-    events: 'dromoney_event_configs_v2',
-    questions: 'dromoney_quiz_questions_v2',
-    prizes: 'dromoney_draw_prizes_v2',
-    tasks: 'dromoney_race_tasks_v2',
-    participants: 'dromoney_event_participants_v2'
+    events: 'dromoney_event_configs_v3',
+    questions: 'dromoney_quiz_questions_v3',
+    prizes: 'dromoney_draw_prizes_v3',
+    cards: 'dromoney_memory_cards_v3',
+    participants: 'dromoney_event_participants_v3'
 };
 
 // ─── Default Data ───────────────────────────
@@ -46,15 +46,16 @@ const DEFAULT_EVENTS = [
         coinReward: 40
     },
     {
-        id: 'task-race',
-        title: 'Task Race',
-        tag: 'Task',
+        id: 'memory-master',
+        title: 'Memory Master',
+        tag: 'Brain',
         fee: 25,
         prize: '₹1500',
         startTime: 'Live Now',
-        participants: 3,
+        participants: 0,
         status: 'Active',
-        timeLimit: 60
+        peekTime: 2.5, // seconds to show cards at start
+        maxTime: 60    // max time to complete
     }
 ];
 
@@ -82,15 +83,13 @@ const DEFAULT_PRIZES = [
     { id: 8, label: '75 Coins', coins: 75, cash: 0 }
 ];
 
-const DEFAULT_TASKS = [
-    { id: 1, text: 'Open the Dromoney App', points: 5 },
-    { id: 2, text: 'Visit the Earn Section', points: 10 },
-    { id: 3, text: 'Check your coins balance', points: 10 },
-    { id: 4, text: 'View one Task in the task list', points: 15 },
-    { id: 5, text: "Share your referral link", points: 20 },
-    { id: 6, text: 'Visit Business Ideas page', points: 15 },
-    { id: 7, text: "Check today's events", points: 10 },
-    { id: 8, text: 'Read How It Works guide', points: 15 }
+const DEFAULT_CARDS = [
+    { id: 1, icon: 'Trophy', color: 'text-amber-500' },
+    { id: 2, icon: 'Zap', color: 'text-blue-500' },
+    { id: 3, icon: 'Heart', color: 'text-rose-500' },
+    { id: 4, icon: 'Star', color: 'text-emerald-500' },
+    { id: 5, icon: 'Ghost', color: 'text-purple-500' },
+    { id: 6, icon: 'Gem', color: 'text-indigo-500' },
 ];
 
 // ─── Helper ─────────────────────────────────
@@ -164,19 +163,19 @@ export const eventStorage = {
         save(KEYS.prizes, prizes);
     },
 
-    // ── Task Race Tasks ──────────────────────
+    // ── Memory Master Cards ───────────────────────
 
-    getTasks: () => {
-        const stored = load(KEYS.tasks, null);
+    getCards: () => {
+        const stored = load(KEYS.cards, null);
         if (!stored) {
-            save(KEYS.tasks, DEFAULT_TASKS);
-            return DEFAULT_TASKS;
+            save(KEYS.cards, DEFAULT_CARDS);
+            return DEFAULT_CARDS;
         }
         return stored;
     },
 
-    updateTasks: (tasks) => {
-        save(KEYS.tasks, tasks);
+    updateCards: (cards) => {
+        save(KEYS.cards, cards);
     },
 
     // ── Participants ─────────────────────────
